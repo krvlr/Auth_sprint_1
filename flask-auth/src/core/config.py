@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     db_user: str = Field(default="", env="DB_USER")
     db_password: str = Field(default="", env="DB_PASSWORD")
 
+    def get_db_url(self) -> str:
+        return (
+            f"postgresql://{self.db_user}:{self.db_password}@"
+            f"{self.db_host}:{self.db_port}/{self.db_name}"
+        )
+
     redis_host: str = Field(default="127.0.0.1", env="REDIS_HOST")
     redis_port: int = Field(default=6379, env="REDIS_PORT")
 
