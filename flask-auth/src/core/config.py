@@ -1,34 +1,56 @@
 import logging
+from pathlib import Path
 
 from pydantic import BaseSettings, Field
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+MIGRATION_DIR = BASE_DIR / "db" / "migrations"
 
-class Settings(BaseSettings):
-    db_host: str = Field(default="127.0.0.1", env="DB_HOST")
-    db_port: str = Field(default=5432, env="DB_PORT")
-    db_name: str = Field(default="auth_db", env="DB_NAME")
-    db_user: str = Field(default="", env="DB_USER")
-    db_password: str = Field(default="", env="DB_PASSWORD")
 
-    def get_db_url(self) -> str:
-        return (
-            f"postgresql://{self.db_user}:{self.db_password}@"
-            f"{self.db_host}:{self.db_port}/{self.db_name}"
-        )
+class LoggerSettings(BaseSettings):
 
-    redis_host: str = Field(default="127.0.0.1", env="REDIS_HOST")
-    redis_port: int = Field(default=6379, env="REDIS_PORT")
-
-    debug_log_level: bool = Field(default=False, env="DEBUG")
-    log_format: str = Field(
+    level: str = Field(default="INFO", env="LOGGING_LEVEL")
+    format: str = Field(
         default="%(asctime)s - %(name)s - %(levelname)s - %(message)s", env="LOG_FORMAT"
     )
-    log_default_handlers = ["console"]
+    default_handlers: list = ["console"]
+
+
+class FlaskSettings(BaseSettings):
+
+    debug: bool = Field(default=False)
+    host: str = Field(default="0.0.0.0")
+    port: int = Field(default="8000")
 
     class Config:
         env_file = ".env"
 
 
-settings = Settings()
+class PostgreSettings(BaseSettings):
 
-log_level = logging.DEBUG if settings.debug_log_level else logging.INFO
+    host: str = Field(default="127.0.0.1", env="AUTH_DB_HOST")
+    port: str = Field(default="5432", env="AUTH_DB_PORT")
+    name: str = Field(default="auth_database", env="AUTH_DB_NAME")
+    user: str = Field(default="admin", env="AUTH_DB_USER")
+    password: str = Field(default="admin", env="AUTH_DB_PASSWORD")
+
+    def get_db_uri(self) -> str:
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+
+    class Config:
+        env_file = ".env"
+
+
+class RedisSettings(BaseSettings):
+
+    host: str = Field(default="127.0.0.1", env="AUTH_REDIS_HOST")
+    port: int = Field(default="6379", env="AUTH_REDIS_PORT")
+
+    class Config:
+        env_file = ".env"
+
+
+logger_settings = LoggerSettings()
+flask_settings = FlaskSettings()
+postgre_settings = PostgreSettings()
+redis_settings = RedisSettings()

@@ -1,16 +1,16 @@
-import logging.config
-
-from flask import Flask
 from gevent import monkey
-
-from api.v1 import account
-from core.config import settings, log_level
-from core.logger import get_logging_config_dict
-from db import init_db
 
 monkey.patch_all()
 
-logging.config.dictConfig(get_logging_config_dict(log_level))
+import logging.config
+
+from api.v1 import account
+from core.config import flask_settings
+from core.logger import LOGGER_CONFIG
+from db import init_db
+from flask import Flask
+
+logging.config.dictConfig(LOGGER_CONFIG)
 
 app = Flask(__name__)
 
@@ -20,7 +20,7 @@ app.register_blueprint(account.account_bp)
 
 if __name__ == "__main__":
     app.run(
-        host="0.0.0.0",
-        port=8000,
-        debug=settings.debug_log_level,
+        host=flask_settings.host,
+        port=flask_settings.port,
+        debug=flask_settings.debug,
     )

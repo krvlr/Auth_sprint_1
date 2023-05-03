@@ -1,4 +1,5 @@
 # Проектная работа 6 спринта
+---
 
 https://github.com/krvlr/Auth_sprint_1
 
@@ -7,33 +8,30 @@ https://github.com/krvlr/Auth_sprint_1
 - Сервис авторизации
 
 ## Описание структуры репозитория:
+---
 
 1. `db` — раздел с настройками базы `PostgreSQL`.
 2. `flask-auth` — раздел с описанием сервиса авторизации.
 3. `nginx` — раздел с описанием настроек `nginx` для сервиса авторизации.
 
-## Краткое описание архитектуры сервиса
----
-
-
 ## Пример запуска
 ---
 
-Перед запуском контейнеров, в корне `/` необходимо создать файл `.env`:
+Перед запуском контейнеров, в корне `/` необходимо создать файл `.env` (в качестве примера `.env.example`):
 
     touch .env
 
 А также указать в нем значения следующих переменных окружения:
 
-    DEBUG
-    DB_HOST
-    DB_PORT
-    DB_ENGINE
-    DB_NAME
-    DB_USER
-    DB_PASSWORD
-    REDIS_HOST
-    REDIS_PORT
+    AUTH_DB_HOST
+    AUTH_DB_PORT
+    AUTH_DB_NAME
+    AUTH_DB_USER
+    AUTH_DB_PASSWORD
+    AUTH_REDIS_HOST
+    AUTH_REDIS_PORT
+    LOGGING_LEVEL
+    LOG_FORMAT
 
 Теперь можно запустить сборку образа и запуск контейнеров:
 
@@ -42,6 +40,13 @@ https://github.com/krvlr/Auth_sprint_1
 Чтобы остановить и полностью удалить контейнеры со всеми `volume` и `network`, описанными в рамках `docker-compose.yml`:
 
     docker-compose down --rmi all -v --remove-orphans
+
+## Миграции
+---
+
+Для генерации миграций структуры таблиц, описание которых находится в дирректории `/flask-auth/src/db/models` необходимо выполнить следующую команду:
+    
+    flask --app main db migrate -m "Описание миграции"
 
 ## Тестирование
 ---

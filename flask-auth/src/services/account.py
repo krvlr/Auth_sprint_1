@@ -1,6 +1,6 @@
+from db import alchemy
 from db.models.user import User
 from utils.exceptions import AccountSignupException
-from db import alchemy
 
 
 def signup(

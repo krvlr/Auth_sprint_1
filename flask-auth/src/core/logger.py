@@ -1,25 +1,23 @@
-from core.config import settings
+from core.config import logger_settings
 
-
-def get_logging_config_dict(log_level):
-    return {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "standard": {"format": settings.log_format},
+LOGGER_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {"format": logger_settings.format},
+    },
+    "handlers": {
+        "console": {
+            "level": logger_settings.level,
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
         },
-        "handlers": {
-            "console": {
-                "level": log_level,
-                "class": "logging.StreamHandler",
-                "formatter": "standard",
-            },
+    },
+    "loggers": {
+        "": {
+            "handlers": logger_settings.default_handlers,
+            "level": logger_settings.level,
+            "propagate": True,
         },
-        "loggers": {
-            "": {
-                "handlers": settings.log_default_handlers,
-                "level": log_level,
-                "propagate": True,
-            },
-        },
-    }
+    },
+}
