@@ -1,8 +1,8 @@
 import logging
+from typing import Type
 
 from flask import abort, request
 from pydantic import BaseModel, ValidationError
-from typing import Type
 
 logger = logging.getLogger(__name__)
 

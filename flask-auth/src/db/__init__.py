@@ -1,13 +1,8 @@
-from pathlib import Path
-
+from core.config import MIGRATION_DIR, postgre_settings
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
-
-from core.config import settings
-
-MIGRATION_DIR = Path(__file__).resolve().parent.parent / "migrations"
 
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -22,6 +17,7 @@ alchemy = SQLAlchemy(metadata=metadata)
 
 def init_db(app: Flask):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_DATABASE_URI"] = settings.get_db_url()
+    app.config["SQLALCHEMY_DATABASE_URI"] = postgre_settings.get_db_uri()
     alchemy.init_app(app)
-    Migrate(app, alchemy, MIGRATION_DIR)
+    print(MIGRATION_DIR)
+    migrate = Migrate(app, alchemy, MIGRATION_DIR)

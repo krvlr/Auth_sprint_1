@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr, validator, UUID4
+from pydantic import UUID4, BaseModel, EmailStr, Field, validator
 
 
 class SignupRq(BaseModel):

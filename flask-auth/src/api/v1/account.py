@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from flask import Blueprint
-
 from models.account import SignupRq, UserDataRs
 from models.common import BaseResponse
 from services import account

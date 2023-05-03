@@ -1,8 +1,8 @@
 import uuid
 
+from db import alchemy
 from flask_bcrypt import check_password_hash, generate_password_hash
 from sqlalchemy import UUID, Column, String
-from db import alchemy
 
 
 class User(alchemy.Model):
@@ -29,9 +29,6 @@ class User(alchemy.Model):
     password_hash = Column(
         String(128), nullable=False, comment="Хэш пароля пользователя"
     )
-    # TODO add login_history
-    # TODO add roles
-    # TODO add jwts
 
     def __repr__(self):
         return f"<User: {self.login}>"
@@ -51,3 +48,8 @@ class User(alchemy.Model):
 
     def to_dict(self):
         return dict(id=self.id, login=self.login, email=self.email)
+
+
+# TODO add login_history
+# TODO add roles
+# TODO add jwts
