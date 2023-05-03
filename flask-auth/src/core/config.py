@@ -8,7 +8,6 @@ MIGRATION_DIR = BASE_DIR / "db" / "migrations"
 
 
 class LoggerSettings(BaseSettings):
-    """Настройки для логирования."""
 
     level: str = Field(default="INFO", env="LOGGING_LEVEL")
     format: str = Field(
@@ -18,7 +17,6 @@ class LoggerSettings(BaseSettings):
 
 
 class FlaskSettings(BaseSettings):
-    """Настройки для flask."""
 
     debug: bool = Field(default=False)
     host: str = Field(default="0.0.0.0")
@@ -29,7 +27,6 @@ class FlaskSettings(BaseSettings):
 
 
 class PostgreSettings(BaseSettings):
-    """Настройки для Auth-PostgreSQL."""
 
     host: str = Field(default="127.0.0.1", env="AUTH_DB_HOST")
     port: str = Field(default="5432", env="AUTH_DB_PORT")
@@ -45,7 +42,6 @@ class PostgreSettings(BaseSettings):
 
 
 class RedisSettings(BaseSettings):
-    """Настройки для Auth-Redis."""
 
     host: str = Field(default="127.0.0.1", env="AUTH_REDIS_HOST")
     port: int = Field(default="6379", env="AUTH_REDIS_PORT")
