@@ -1,8 +1,9 @@
 import uuid
+from datetime import datetime
 
 from db import alchemy
 from flask_bcrypt import check_password_hash, generate_password_hash
-from sqlalchemy import UUID, Column, String
+from sqlalchemy import UUID, Column, DateTime, String
 
 
 class User(alchemy.Model):
@@ -15,6 +16,17 @@ class User(alchemy.Model):
         unique=True,
         nullable=False,
         comment="Идентификатор пользователя",
+    )
+    created = Column(
+        DateTime(),
+        nullable=False,
+        default=datetime.utcnow(),
+        comment="Время создания записи",
+    )
+    modified = Column(
+        DateTime(),
+        nullable=True,
+        comment="Время изменения записи",
     )
     login = Column(
         String(256),
@@ -35,7 +47,7 @@ class User(alchemy.Model):
 
     @property
     def password(self):
-        raise AttributeError("Password is not a readable attribute")
+        raise AttributeError("Пароль не является читаемым атрибутом")
 
     @password.setter
     def password(self, password):
@@ -47,9 +59,4 @@ class User(alchemy.Model):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
-        return dict(id=self.id, login=self.login, email=self.email)
-
-
-# TODO add login_history
-# TODO add roles
-# TODO add jwts
+        return dict(login=self.login, email=self.email)

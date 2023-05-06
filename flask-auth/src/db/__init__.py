@@ -19,4 +19,4 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_DATABASE_URI"] = postgre_settings.get_db_uri()
     alchemy.init_app(app)
-    migrate = Migrate(app, alchemy, MIGRATION_DIR)
+    Migrate(app, alchemy, MIGRATION_DIR)

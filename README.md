@@ -30,6 +30,11 @@ https://github.com/krvlr/Auth_sprint_1
     AUTH_DB_PASSWORD
     AUTH_REDIS_HOST
     AUTH_REDIS_PORT
+    JWT_COOKIE_SECURE
+    JWT_TOKEN_LOCATION
+    JWT_SECRET_KEY
+    JWT_ACCESS_TOKEN_EXPIRES
+    JWT_REFRESH_TOKEN_EXPIRES
     LOGGING_LEVEL
     LOG_FORMAT
 
@@ -44,9 +49,17 @@ https://github.com/krvlr/Auth_sprint_1
 ## Миграции
 ---
 
+Первым шагом необходимо перейти в дирректорию c точкой входа (`main.py`):
+
+    cd /flask-auth/src/
+
 Для генерации миграций структуры таблиц, описание которых находится в дирректории `/flask-auth/src/db/models` необходимо выполнить следующую команду:
     
     flask --app main db migrate -m "Описание миграции"
+
+Для применения сформированной миграции необхожимо выполнить следующую команду:
+    
+    flask --app main db upgrade
 
 ## Тестирование
 ---
