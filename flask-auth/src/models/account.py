@@ -36,5 +36,5 @@ class AuthUserDataResponse(BaseModel):
 
 
 class SigninRequest(BaseModel):
-    login: str = Field(..., title="Login")
-    password: str = Field(..., title="Password")
+    login: str = Field(..., title="Логин")
+    password: str = Field(..., title="Пароль")

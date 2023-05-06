@@ -42,8 +42,7 @@ class AuthService:
         user = User.query.filter_by(login=login).one_or_none()
 
         if user and user.verify_password(password):
-            # Необходимо логирование входа
-            # Необходимо сохранение refresh_token в базу для поддержания его уникальности
+            # TODO: Необходимо логирование входа
             access_token = create_access_token(identity=user.to_dict())
             refresh_token = create_refresh_token(identity=user.to_dict())
 
