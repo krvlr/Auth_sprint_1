@@ -31,8 +31,8 @@ class UserDataResponse(BaseModel):
 
 
 class AuthUserDataResponse(BaseModel):
-    refresh_token: None | str = Field(..., title="")
-    access_token: None | str = Field(..., title="")
+    refresh_token: str = Field(..., title="Refresh токен")
+    access_token: str = Field(..., title="Access токен")
 
 
 class SigninRequest(BaseModel):
