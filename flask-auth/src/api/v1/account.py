@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, jsonify
 from flask_jwt_extended import (
     get_jti,
     get_jwt_identity,
@@ -47,7 +47,7 @@ def signin():
         response = jsonify(BaseResponse().dict())
         set_access_cookies(response, auth_data.access_token)
         set_refresh_cookies(response, auth_data.refresh_token)
-        current_app.logger.info(f"jti = {get_jti(auth_data.refresh_token)}")
+
         return response, HTTPStatus.OK
     except AccountSigninException as error:
         response = jsonify(
