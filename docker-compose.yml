@@ -40,8 +40,8 @@ services:
       - movies_network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-    expose:
-      - "6379"
+    ports:
+      - "6379:6379" # TODO remove
 
   api-auth:
     build:

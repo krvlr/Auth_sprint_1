@@ -8,25 +8,27 @@ from flask_jwt_extended import (
     set_access_cookies,
     set_refresh_cookies,
 )
-from models.account import SigninRequest, SignupRequest
+from models.account import AuthUserDataResponse, SigninRequest, SignupRequest
 from models.common import BaseResponse
-from services.account import AuthService
-from utils.common import get_body
+from services.account import get_auth_service
+from utils.common import get_body, set_jwt_in_cookie
 from utils.exceptions import AccountSigninException, AccountSignupException
 
 account_bp = Blueprint("auth", __name__)
+auth_service = get_auth_service()
 
 
 @account_bp.route("/api/v1/signup", methods=["POST"])
 def signup():
     try:
         body = get_body(SignupRequest)
-        user_data = AuthService.signup(
+        auth_service.signup(
             login=body.login,
             email=body.email,
             password=body.password,
         )
-        response = jsonify(BaseResponse(data=user_data.dict()).dict())
+
+        response = jsonify(BaseResponse().dict())
         return response, HTTPStatus.CREATED
     except AccountSignupException as error:
         response = jsonify(
@@ -39,14 +41,20 @@ def signup():
 def signin():
     try:
         body = get_body(SigninRequest)
-        auth_data = AuthService.signin(
-            login=body.login,
-            password=body.password,
+        auth_data = AuthUserDataResponse(
+            **auth_service.signin(
+                login=body.login,
+                password=body.password,
+            )
         )
 
         response = jsonify(BaseResponse().dict())
-        set_access_cookies(response, auth_data.access_token)
-        set_refresh_cookies(response, auth_data.refresh_token)
+
+        set_jwt_in_cookie(
+            response=response,
+            access_token=auth_data.access_token,
+            refresh_token=auth_data.refresh_token,
+        )
 
         return response, HTTPStatus.OK
     except AccountSigninException as error:
@@ -56,7 +64,8 @@ def signin():
         return response, HTTPStatus.UNAUTHORIZED
 
 
-# шаблон для примера ручки с проверкой access_token (Only non-refresh tokens are allowed)
+# TODO: шаблон для ручeк /password/change, /signout, /signout/all, /history
+#  с проверкой access_token (Only non-refresh tokens are allowed)
 @account_bp.route("/protected", methods=["GET"])
 @jwt_required()
 def protected():
@@ -64,7 +73,7 @@ def protected():
     return jsonify(logged_in_as=current_user), HTTPStatus.OK
 
 
-# шаблон для примера ручки /refresh (Only refresh tokens are allowed)
+# TODO: шаблон для ручки /refresh (Only refresh tokens are allowed)
 @account_bp.route("/refresh_protected", methods=["GET"])
 @jwt_required(refresh=True)
 def refresh_protected():

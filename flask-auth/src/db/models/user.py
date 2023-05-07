@@ -3,7 +3,7 @@ from datetime import datetime
 
 from db import alchemy
 from flask_bcrypt import check_password_hash, generate_password_hash
-from sqlalchemy import UUID, Column, DateTime, String
+from sqlalchemy import UUID, Boolean, Column, DateTime, String
 
 
 class User(alchemy.Model):
@@ -41,6 +41,16 @@ class User(alchemy.Model):
     password_hash = Column(
         String(128), nullable=False, comment="Хэш пароля пользователя"
     )
+    is_active = Column(
+        Boolean, nullable=False, default=True, comment="Признак активного пользователя"
+    )
+    is_verified = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        comment="Признак верефицированного пользователя",
+    )
+    is_admin = Column(Boolean, nullable=False, comment="Признак администратора")
 
     def __repr__(self):
         return f"<User: {self.login}>"
@@ -59,4 +69,13 @@ class User(alchemy.Model):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
-        return dict(login=self.login, email=self.email)
+        return dict(
+            id=self.id,
+            created=self.created,
+            modified=self.modified,
+            login=self.login,
+            email=self.email,
+            is_active=self.is_active,
+            is_verified=self.is_verified,
+            is_admin=self.is_admin,
+        )

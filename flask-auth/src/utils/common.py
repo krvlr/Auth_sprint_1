@@ -1,6 +1,6 @@
 from typing import Type
 
-from flask import abort, current_app, request
+from flask import abort, current_app, jsonify, request
 from pydantic import BaseModel, ValidationError
 
 
@@ -11,3 +11,8 @@ def get_body(request_model: Type[BaseModel]) -> dict:
     except ValidationError as err:
         current_app.logger.error(f"{err.__class__.__name__}: {err}")
         abort(422, description=err.errors())
+
+
+def set_jwt_in_cookie(response: jsonify, access_token: str, refresh_token: str):
+    response.set_cookie("access_token_cookie", value=access_token, httponly=True)
+    response.set_cookie("refresh_token_cookie", value=refresh_token, httponly=True)
