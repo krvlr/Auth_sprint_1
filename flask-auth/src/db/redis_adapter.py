@@ -18,7 +18,7 @@ class RedisAdapter(CacheAdapter):
         return cache_key
 
     def get(self, cache_key: str):
-        self.cache_provider.get(name=cache_key)
+        return self.cache_provider.get(name=cache_key)
 
     def setex(self, cache_key: str, value: Any, delta_expire: Union[int, timedelta]):
         self.cache_provider.setex(
@@ -26,7 +26,7 @@ class RedisAdapter(CacheAdapter):
         )
 
     def change(self, cache_key: str, value: Any):
-        ttl = self.cache_provider.ttl(name=cache_key)
+        ttl = self.cache_provider.get_ttl(name=cache_key)
         if ttl:
             self.setex(cache_key=cache_key, value=value, delta_expire=ttl)
 
