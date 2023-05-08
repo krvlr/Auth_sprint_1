@@ -3,12 +3,16 @@ from uuid import UUID
 
 from db import alchemy
 from db.base_cache import CacheAdapter
-from db.cache_adapter import get_redis_adapter
 from db.models.user import User
+from db.redis_adapter import get_redis_adapter
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
 from user_agents import parse
-from utils.exceptions import AccountSigninException, AccountSignupException
+from utils.exceptions import (
+    AccountRefreshException,
+    AccountSigninException,
+    AccountSignupException,
+)
 
 
 class AuthService:
@@ -21,7 +25,7 @@ class AuthService:
         device_info = str(user_agent)
         return device_info
 
-    def create_jwt_tokens(self, user_id: UUID, device_info: str) -> dict:
+    def create_jwt_tokens(self, user_id: str, device_info: str) -> dict:
         identity = {"id": user_id, "device_info": device_info}
 
         access_token = create_access_token(identity=identity)
@@ -83,11 +87,31 @@ class AuthService:
         if user and user.verify_password(password):
             device_info = self.get_user_agent_info()
             jwt_tokens = self.create_jwt_tokens(
-                user_id=user.id, device_info=device_info
+                user_id=str(user.id), device_info=device_info
             )
             return jwt_tokens
 
         raise AccountSigninException(error_message="Неверный логин или пароль.")
+
+    def refresh(self, user_id: str, device_info: str, refresh_jti: str) -> dict:
+        cache_key_refresh_token = self.cache_adapter.generate_key(user_id, refresh_jti)
+        status = self.cache_adapter.get(cache_key_refresh_token)
+        if not status:
+            raise AccountRefreshException(
+                error_message="Истек срок действия refresh токена."
+            )
+        elif status == "blocked":
+            raise AccountRefreshException(
+                error_message="Данный refresh токен в block-листе."
+            )
+        elif status == "active":
+            self.cache_adapter.change(
+                cache_key=cache_key_refresh_token, value="blocked"
+            )
+
+        jwt_tokens = self.create_jwt_tokens(user_id=user_id, device_info=device_info)
+
+        return jwt_tokens
 
 
 @lru_cache()
