@@ -18,21 +18,17 @@ class RedisAdapter(CacheAdapter):
         return cache_key
 
     def get(self, cache_key: str):
-        return self.cache_provider.get(name=cache_key)
+        return self.cache_provider.get(key=cache_key)
 
-    def setex(self, cache_key: str, value: Any, delta_expire: Union[int, timedelta]):
-        self.cache_provider.setex(
-            name=cache_key, value=value, delta_expire=delta_expire
-        )
+    def set(self, cache_key: str, value: Any, delta_expire: Union[int, timedelta]):
+        self.cache_provider.set(key=cache_key, value=value, delta_expire=delta_expire)
 
-    def change(self, cache_key: str, value: Any):
-        ttl = self.cache_provider.get_ttl(name=cache_key)
-        if ttl:
-            self.setex(cache_key=cache_key, value=value, delta_expire=ttl)
+    def update(self, cache_key: str, value: Any):
+        self.cache_provider.update(key=cache_key, value=value)
 
-    def change_for_pattern(self, pattern: str, value: Any):
+    def update_for_pattern(self, pattern: str, value: Any):
         for cache_key in self.cache_provider.search(pattern=pattern):
-            self.change(cache_key=cache_key, value=value)
+            self.update(cache_key=cache_key, value=value)
 
 
 @lru_cache()

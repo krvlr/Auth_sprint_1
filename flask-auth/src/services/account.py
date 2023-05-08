@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import lru_cache
 from uuid import UUID
 
@@ -13,6 +14,11 @@ from utils.exceptions import (
     AccountSigninException,
     AccountSignupException,
 )
+
+
+class Status(Enum):
+    ACTIVE = "active"
+    BLOCKED = "blocked"
 
 
 class AuthService:
@@ -34,17 +40,17 @@ class AuthService:
         cache_key_access_token = self.cache_adapter.generate_key(
             user_id, get_jti(access_token)
         )
-        self.cache_adapter.setex(
+        self.cache_adapter.set(
             cache_key=cache_key_access_token,
-            value="active",
+            value=Status.ACTIVE.value,
             delta_expire=current_app.config["JWT_ACCESS_TOKEN_EXPIRES"],
         )
         cache_key_refresh_token = self.cache_adapter.generate_key(
             user_id, get_jti(refresh_token)
         )
-        self.cache_adapter.setex(
+        self.cache_adapter.set(
             cache_key=cache_key_refresh_token,
-            value="active",
+            value=Status.ACTIVE.value,
             delta_expire=current_app.config["JWT_REFRESH_TOKEN_EXPIRES"],
         )
 
@@ -86,10 +92,7 @@ class AuthService:
 
         if user and user.verify_password(password):
             device_info = self.get_user_agent_info()
-            jwt_tokens = self.create_jwt_tokens(
-                user_id=str(user.id), device_info=device_info
-            )
-            return jwt_tokens
+            return self.create_jwt_tokens(user_id=str(user.id), device_info=device_info)
 
         raise AccountSigninException(error_message="Неверный логин или пароль.")
 
@@ -102,16 +105,14 @@ class AuthService:
             )
         elif status == "blocked":
             raise AccountRefreshException(
-                error_message="Данный refresh токен в block-листе."
+                error_message="Данный refresh токен более не валиден."
             )
         elif status == "active":
-            self.cache_adapter.change(
-                cache_key=cache_key_refresh_token, value="blocked"
+            self.cache_adapter.update(
+                cache_key=cache_key_refresh_token, value=Status.BLOCKED.value
             )
 
-        jwt_tokens = self.create_jwt_tokens(user_id=user_id, device_info=device_info)
-
-        return jwt_tokens
+        return self.create_jwt_tokens(user_id=user_id, device_info=device_info)
 
 
 @lru_cache()
