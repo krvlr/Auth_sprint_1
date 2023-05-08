@@ -96,4 +96,3 @@ https://github.com/krvlr/Auth_sprint_1
 Установим `pre-commit hook`:
 
     pre-commit install
-

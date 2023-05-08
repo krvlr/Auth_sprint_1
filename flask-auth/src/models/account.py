@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field, validator
 from utils.exceptions import AccountSignupException
 
@@ -23,11 +25,6 @@ class SignupRequest(BaseModel):
                 "Длина пароля должна содежать не менее 6 и не более 72 символов."
             )
         return v
-
-
-class UserDataResponse(BaseModel):
-    login: str = Field(..., title="Логин")
-    email: EmailStr = Field(..., title="Почта")
 
 
 class AuthUserDataResponse(BaseModel):
