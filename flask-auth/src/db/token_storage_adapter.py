@@ -3,12 +3,11 @@ from abc import ABCMeta
 from datetime import timedelta
 from enum import Enum
 from functools import lru_cache
-
-from redis import Redis
 from typing import Any, Union
 
 from core.config import redis_settings
-from db.token_storage_provider import TokenStorageRedisProvider, TokenStorageProvider
+from db.token_storage_provider import TokenStorageProvider, TokenStorageRedisProvider
+from redis import Redis
 
 
 class TokenStatus(Enum):
@@ -35,7 +34,7 @@ class TokenStorageAdapter(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
-    def block_for_pattern(self, user_id: str, jti: str, pattern: str):
+    def block_for_pattern(self, pattern: str):
         pass
 
 
@@ -63,7 +62,7 @@ class TokenStorageRedisAdapter(TokenStorageAdapter):
             value=TokenStatus.BLOCKED.value,
         )
 
-    def block_for_pattern(self, user_id: str, jti: str, pattern: str):
+    def block_for_pattern(self, pattern: str):
         for key in self.token_storage_provider.search(pattern=pattern):
             self.token_storage_provider.update(
                 key=key,

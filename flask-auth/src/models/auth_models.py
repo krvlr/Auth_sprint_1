@@ -1,7 +1,5 @@
-from pydantic import BaseModel, EmailStr, validator
-from pydantic import Field
-
-from utils.exceptions import AccountSignupException, AccountPasswordChangeException
+from pydantic import BaseModel, EmailStr, Field, validator
+from utils.exceptions import AccountPasswordChangeException, AccountSignupException
 
 
 class SignupRequest(BaseModel):
@@ -27,7 +25,7 @@ class SignupRequest(BaseModel):
         return v
 
 
-class AuthUserDataResponse(BaseModel):
+class AuthResponse(BaseModel):
     refresh_token: str = Field(..., title="Refresh токен")
     access_token: str = Field(..., title="Access токен")
 
@@ -35,6 +33,10 @@ class AuthUserDataResponse(BaseModel):
 class SigninRequest(BaseModel):
     login: str = Field(..., title="Логин")
     password: str = Field(..., title="Пароль")
+
+
+class SignoutRequest(BaseModel):
+    refresh_token: str = Field(..., title="Refresh токен")
 
 
 class PasswordChangeRequest(BaseModel):
