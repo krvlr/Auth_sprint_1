@@ -1,13 +1,11 @@
-from typing import Type
-
 from flask import abort, current_app, jsonify, request
 from pydantic import BaseModel, ValidationError
+from typing import Type, Any
 
 
-def get_body(request_model: Type[BaseModel]) -> dict:
+def get_data_from_body(request_model: Type[BaseModel]) -> Any:
     try:
-        body = request_model.parse_obj(request.get_json())
-        return body
+        return request_model.parse_obj(request.get_json())
     except ValidationError as err:
         current_app.logger.error(f"{err.__class__.__name__}: {err}")
         abort(422, description=err.errors())

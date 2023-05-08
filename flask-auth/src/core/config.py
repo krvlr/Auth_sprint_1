@@ -47,12 +47,8 @@ class RedisSettings(BaseSettings):
 
 class JWTSettings(BaseSettings):
     cookie_secure: str = Field(default="False", repr=False, env="JWT_COOKIE_SECURE")
-    token_location: str = Field(
-        default="cookies", repr=False, env="JWT_COOKIE_LOCATION"
-    )
-    secret_key: str = Field(
-        default="SUPER-SECRET-KEY", repr=False, env="JWT_SECRET_KEY"
-    )
+    token_location: str = Field(default="cookies", repr=False, env="JWT_TOKEN_LOCATION")
+    secret_key: str = Field(default="SUPER-SECRET-KEY", repr=False, env="JWT_SECRET_KEY")
     access_token_expires: int = Field(default=1, env="JWT_ACCESS_TOKEN_EXPIRES")
     refresh_token_expires: int = Field(default=30, env="JWT_REFRESH_TOKEN_EXPIRES")
 
