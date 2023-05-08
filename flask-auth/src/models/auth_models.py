@@ -1,7 +1,7 @@
-from uuid import UUID
+from pydantic import BaseModel, EmailStr, validator
+from pydantic import Field
 
-from pydantic import BaseModel, EmailStr, Field, validator
-from utils.exceptions import AccountSignupException
+from utils.exceptions import AccountSignupException, AccountPasswordChangeException
 
 
 class SignupRequest(BaseModel):
@@ -19,10 +19,10 @@ class SignupRequest(BaseModel):
 
     @validator("password")
     def password_length(cls, v):
-        if len(v) < 6:
+        if not (6 <= len(v) <= 72):
             raise AccountSignupException(
                 error_message="Пароль не удовлетворяет требованиям безопасности. "
-                "Длина пароля должна содежать не менее 6 и не более 72 символов."
+                "Длина пароля должна содержать не менее 6 и не более 72 символов."
             )
         return v
 
@@ -35,3 +35,17 @@ class AuthUserDataResponse(BaseModel):
 class SigninRequest(BaseModel):
     login: str = Field(..., title="Логин")
     password: str = Field(..., title="Пароль")
+
+
+class PasswordChangeRequest(BaseModel):
+    old_password: str = Field(..., title="Старый пароль")
+    new_password: str = Field(..., title="Новый пароль")
+
+    @validator("new_password")
+    def password_length(cls, v):
+        if not (6 <= len(v) <= 72):
+            raise AccountPasswordChangeException(
+                error_message="Пароль не удовлетворяет требованиям безопасности. "
+                "Длина пароля должна содержать не менее 6 и не более 72 символов."
+            )
+        return v

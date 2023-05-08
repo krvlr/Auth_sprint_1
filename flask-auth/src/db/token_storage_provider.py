@@ -1,11 +1,30 @@
+import abc
+from abc import ABCMeta
 from datetime import timedelta
-from typing import Any, Optional, Union
 
-from db.base_cache import CacheProvider
 from redis import Redis
+from typing import Any, Union
 
 
-class RedisProvider(CacheProvider):
+class TokenStorageProvider(metaclass=ABCMeta):
+    @abc.abstractmethod
+    def get(self, key: str):
+        pass
+
+    @abc.abstractmethod
+    def set(self, key: str, value: Any, delta_expire: Union[int, timedelta]):
+        pass
+
+    @abc.abstractmethod
+    def update(self, key: str, value: Any):
+        pass
+
+    @abc.abstractmethod
+    def search(self, pattern: str):
+        pass
+
+
+class TokenStorageRedisProvider(TokenStorageProvider):
     def __init__(self, redis: Redis):
         self.redis = redis
 
