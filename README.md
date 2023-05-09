@@ -68,6 +68,27 @@ https://github.com/krvlr/Auth_sprint_1
 
     cd flask-auth/tests/functional/
 
+создать файл `.env` (в качестве примера `flask-auth/tests/functional/.env.example`):
+
+    touch .env
+
+указать в нем значения следующих переменных окружения:
+
+    AUTH_DB_HOST
+    AUTH_DB_PORT
+    AUTH_DB_NAME
+    AUTH_DB_USER
+    AUTH_DB_PASSWORD
+    AUTH_REDIS_HOST
+    AUTH_REDIS_PORT
+    JWT_COOKIE_SECURE
+    JWT_TOKEN_LOCATION
+    JWT_SECRET_KEY
+    JWT_ACCESS_TOKEN_EXPIRES
+    JWT_REFRESH_TOKEN_EXPIRES
+    LOGGING_LEVEL
+    LOG_FORMAT
+
 И запустить сборку образа и запуск контейнеров для тестирования:
 
     docker compose up --build
