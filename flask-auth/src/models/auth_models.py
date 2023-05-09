@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, validator
+
 from utils.exceptions import AccountPasswordChangeException, AccountSignupException
 
 
@@ -51,3 +52,8 @@ class PasswordChangeRequest(BaseModel):
                 "Длина пароля должна содержать не менее 6 и не более 72 символов."
             )
         return v
+
+
+class PaginatorRequest(BaseModel):
+    page_num: int = Field(default=1, title="Номер страницы", ge=1)
+    page_size: int = Field(default=20, title="Размер страницы", ge=1, le=50)

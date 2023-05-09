@@ -5,19 +5,20 @@ from flask_jwt_extended import (
     current_user,
     get_jti,
     get_jwt,
-    get_jwt_identity,
     jwt_required,
 )
+
 from models.auth_models import (
     AuthResponse,
     PasswordChangeRequest,
     SigninRequest,
     SignoutRequest,
     SignupRequest,
+    PaginatorRequest,
 )
 from models.common import BaseResponse
 from services.auth_service import get_auth_service
-from utils.common import get_data_from_body, set_jwt_in_cookie
+from utils.common import get_data_from_body, set_jwt_in_cookie, get_data_from_params
 from utils.exceptions import (
     AccountPasswordChangeException,
     AccountRefreshException,
@@ -25,23 +26,26 @@ from utils.exceptions import (
     AccountSignoutAllException,
     AccountSignoutException,
     AccountSignupException,
+    AccountHistoryException,
 )
+from utils.user_action import log_action
 
 account_bp = Blueprint("auth", __name__)
 auth_service = get_auth_service()
 
 
 @account_bp.route("/api/v1/signup", methods=["POST"])
+@log_action
 def signup():
     try:
         body = get_data_from_body(SignupRequest)
-        auth_service.signup(
+        user_data = auth_service.signup(
             login=body.login,
             email=body.email,
             password=body.password,
         )
 
-        return jsonify(BaseResponse().dict()), HTTPStatus.CREATED
+        return jsonify(BaseResponse(data=user_data).dict()), HTTPStatus.CREATED
     except AccountSignupException as ex:
         return (
             jsonify(BaseResponse(success=False, error=ex.error_message).dict()),
@@ -50,6 +54,7 @@ def signup():
 
 
 @account_bp.route("/api/v1/signin", methods=["POST"])
+@log_action
 def signin():
     try:
         body = get_data_from_body(SigninRequest)
@@ -78,14 +83,15 @@ def signin():
 
 @account_bp.route("/api/v1/refresh", methods=["GET"])
 @jwt_required(refresh=True)
+@log_action
 def refresh():
     try:
         refresh_jwt_info = get_jwt()
         auth_data = AuthResponse(
             **auth_service.refresh(
-                user_id=refresh_jwt_info()["sub"]["id"],
-                device_info=refresh_jwt_info()["sub"]["device_info"],
-                refresh_jti=refresh_jwt_info()["jti"],
+                user_id=refresh_jwt_info["sub"]["id"],
+                device_info=refresh_jwt_info["sub"]["device_info"],
+                refresh_jti=refresh_jwt_info["jti"],
             )
         )
 
@@ -107,6 +113,7 @@ def refresh():
 
 @account_bp.route("/api/v1/password/change", methods=["POST"])
 @jwt_required()
+@log_action
 def password_change():
     try:
         body = get_data_from_body(PasswordChangeRequest)
@@ -130,14 +137,14 @@ def password_change():
 
 @account_bp.route("/api/v1/signout", methods=["POST"])
 @jwt_required()
+@log_action
 def signout():
     try:
         body = get_data_from_body(SignoutRequest)
-        access_jwt_info = get_jwt()
         auth_service.signout(
-            user_id=access_jwt_info["sub"]["id"],
+            user_id=current_user.id,
             refresh_jti=get_jti(body.refresh_token),
-            access_jti=access_jwt_info["jti"],
+            access_jti=get_jwt()["jti"],
         )
 
         return jsonify(BaseResponse().dict()), HTTPStatus.OK
@@ -150,15 +157,33 @@ def signout():
 
 @account_bp.route("/api/v1/signout/all", methods=["POST"])
 @jwt_required()
+@log_action
 def signout_all():
     try:
-        access_jwt_info = get_jwt()
-        auth_service.signout_all(
-            user_id=access_jwt_info["sub"]["id"], access_jti=access_jwt_info["jti"]
-        )
+        auth_service.signout_all(user_id=current_user.id, access_jti=get_jwt()["jti"])
 
         return jsonify(BaseResponse().dict()), HTTPStatus.OK
     except AccountSignoutAllException as error:
+        return (
+            jsonify(BaseResponse(success=False, error=error.error_message).dict()),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+
+@account_bp.route("/api/v1/history", methods=["GET"])
+@jwt_required()
+def history():
+    try:
+        paginator = get_data_from_params(PaginatorRequest)
+        history = auth_service.history(
+            user_id=current_user.id,
+            access_jti=get_jwt()["jti"],
+            page_size=paginator.page_size,
+            page_num=paginator.page_num,
+        )
+
+        return jsonify(BaseResponse(data=history).dict()), HTTPStatus.OK
+    except AccountHistoryException as error:
         return (
             jsonify(BaseResponse(success=False, error=error.error_message).dict()),
             HTTPStatus.BAD_REQUEST,

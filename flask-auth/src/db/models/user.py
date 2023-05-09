@@ -1,9 +1,9 @@
 import uuid
-from datetime import datetime
+
+from flask_bcrypt import check_password_hash, generate_password_hash
+from sqlalchemy import UUID, Boolean, Column, DateTime, String, func
 
 from db import alchemy
-from flask_bcrypt import check_password_hash, generate_password_hash
-from sqlalchemy import UUID, Boolean, Column, DateTime, String
 
 
 class User(alchemy.Model):
@@ -18,13 +18,15 @@ class User(alchemy.Model):
         comment="Идентификатор пользователя",
     )
     created = Column(
-        DateTime(),
+        DateTime,
         nullable=False,
-        default=datetime.utcnow(),
+        default=func.now(),
         comment="Время создания записи",
     )
     modified = Column(
-        DateTime(),
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
         nullable=True,
         comment="Время изменения записи",
     )
@@ -48,7 +50,7 @@ class User(alchemy.Model):
         Boolean,
         nullable=False,
         default=False,
-        comment="Признак верефицированного пользователя",
+        comment="Признак верифицированного пользователя",
     )
     is_admin = Column(Boolean, nullable=False, comment="Признак администратора")
 

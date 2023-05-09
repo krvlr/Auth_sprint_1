@@ -1,15 +1,15 @@
-"""Create user table
+"""create_user_table
 
-Revision ID: 4f3ab931d8bc
-Revises:
-Create Date: 2023-05-08 21:54:36.080269
+Revision ID: f1275efe010c
+Revises: 
+Create Date: 2023-05-09 18:19:12.987866
 
 """
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "4f3ab931d8bc"
+revision = "f1275efe010c"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,7 +26,11 @@ def upgrade():
             "created", sa.DateTime(), nullable=False, comment="Время создания записи"
         ),
         sa.Column(
-            "modified", sa.DateTime(), nullable=True, comment="Время изменения записи"
+            "modified",
+            sa.DateTime(),
+            nullable=True,
+            comment="Время изменения записи",
+            onupdate=sa.DateTime(),
         ),
         sa.Column(
             "login", sa.String(length=256), nullable=False, comment="Логин пользователя"
@@ -53,7 +57,7 @@ def upgrade():
             "is_verified",
             sa.Boolean(),
             nullable=False,
-            comment="Признак верефицированного пользователя",
+            comment="Признак верифицированного пользователя",
         ),
         sa.Column(
             "is_admin", sa.Boolean(), nullable=False, comment="Признак администратора"

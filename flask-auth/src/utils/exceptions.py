@@ -30,3 +30,8 @@ class AccountSignoutAllException(Exception):
         self.error_message = (
             f"Ошибка при попытке выйти со всех устройств аккаунта. {error_message}"
         )
+
+
+class AccountHistoryException(Exception):
+    def __init__(self, error_message: str):
+        self.error_message = f"Ошибка при попытке получения истории действий пользователя. {error_message}"
