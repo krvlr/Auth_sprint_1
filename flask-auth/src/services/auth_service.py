@@ -1,18 +1,18 @@
 from functools import lru_cache
 
+from db import alchemy
+from db.models.user import User
+from db.token_storage_adapter import TokenStatus, TokenStorageAdapter, get_redis_adapter
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
 from user_agents import parse
-
-from db import alchemy
-from db.models.user import User
-from db.token_storage_adapter import TokenStorageAdapter, TokenStatus
-from db.token_storage_adapter import get_redis_adapter
 from utils.exceptions import (
+    AccountPasswordChangeException,
     AccountRefreshException,
     AccountSigninException,
+    AccountSignoutAllException,
+    AccountSignoutException,
     AccountSignupException,
-    AccountPasswordChangeException,
 )
 
 
@@ -83,13 +83,18 @@ class AuthService:
         raise AccountSigninException(error_message="Неверный логин или пароль.")
 
     def refresh(self, user_id: str, device_info: str, refresh_jti: str) -> dict:
-        status = self.token_storage.get_status(user_id, refresh_jti)
+        status = self.token_storage.get_status(user_id=user_id, jti=refresh_jti)
+
         if status == TokenStatus.NOT_FOUND:
-            raise AccountRefreshException(error_message="Истек срок действия refresh токена.")
+            raise AccountRefreshException(
+                error_message="Истек срок действия refresh токена."
+            )
         elif status == TokenStatus.BLOCKED:
-            raise AccountRefreshException(error_message="Данный refresh токен более не валиден.")
-        elif status == TokenStatus.ACTIVE:
-            self.token_storage.block(user_id, refresh_jti)
+            raise AccountRefreshException(
+                error_message="Данный refresh токен более не валиден."
+            )
+
+        self.token_storage.block(user_id=user_id, jti=refresh_jti)
 
         return self.create_jwt_tokens(user_id=user_id, device_info=device_info)
 
@@ -101,9 +106,11 @@ class AuthService:
         old_password: str,
         new_password: str,
     ):
-        status = self.token_storage.get_status(user.id, access_jti)
+        status = self.token_storage.get_status(user_id=user.id, jti=access_jti)
         if status == TokenStatus.NOT_FOUND:
-            raise AccountPasswordChangeException(error_message="Истек срок действия access токена.")
+            raise AccountPasswordChangeException(
+                error_message="Истек срок действия access токена."
+            )
         elif status == TokenStatus.BLOCKED:
             raise AccountPasswordChangeException(
                 error_message="Данный access токен более не валиден."
@@ -113,7 +120,44 @@ class AuthService:
             user.password = new_password
             alchemy.session.commit()
         else:
-            raise AccountPasswordChangeException(error_message="Старый пароль введен неверно")
+            raise AccountPasswordChangeException(
+                error_message="Старый пароль введен неверно."
+            )
+
+    # TODO: логирование ручки на действие
+    def signout(self, user_id: str, refresh_jti: str, access_jti: str):
+        access_status = self.token_storage.get_status(user_id=user_id, jti=access_jti)
+
+        if access_status == TokenStatus.NOT_FOUND:
+            raise AccountSignoutException(
+                error_message="Истек срок действия access токена."
+            )
+        elif access_status == TokenStatus.BLOCKED:
+            raise AccountSignoutException(
+                error_message="Данный access токен более не валиден."
+            )
+
+        self.token_storage.block(user_id=user_id, jti=access_jti)
+        self.token_storage.block(user_id=user_id, jti=refresh_jti)
+
+    # TODO: логирование ручки на действие
+    def signout_all(
+        self,
+        user_id: str,
+        access_jti: str,
+    ):
+        status = self.token_storage.get_status(user_id=user_id, jti=access_jti)
+
+        if status == TokenStatus.NOT_FOUND:
+            raise AccountSignoutAllException(
+                error_message="Истек срок действия access токена."
+            )
+        elif status == TokenStatus.BLOCKED:
+            raise AccountSignoutAllException(
+                error_message="Данный access токен более не валиден."
+            )
+
+        self.token_storage.block_for_pattern(pattern=f"{user_id}:*")
 
 
 @lru_cache()
