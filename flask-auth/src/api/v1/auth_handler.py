@@ -80,11 +80,12 @@ def signin():
 @jwt_required(refresh=True)
 def refresh():
     try:
+        refresh_jwt_info = get_jwt()
         auth_data = AuthResponse(
             **auth_service.refresh(
-                user_id=get_jwt()["sub"]["id"],
-                device_info=get_jwt()["sub"]["device_info"],
-                refresh_jti=get_jwt()["jti"],
+                user_id=refresh_jwt_info()["sub"]["id"],
+                device_info=refresh_jwt_info()["sub"]["device_info"],
+                refresh_jti=refresh_jwt_info()["jti"],
             )
         )
 
@@ -132,11 +133,11 @@ def password_change():
 def signout():
     try:
         body = get_data_from_body(SignoutRequest)
-
+        access_jwt_info = get_jwt()
         auth_service.signout(
-            user_id=get_jwt()["sub"]["id"],
+            user_id=access_jwt_info["sub"]["id"],
             refresh_jti=get_jti(body.refresh_token),
-            access_jti=get_jwt()["jti"],
+            access_jti=access_jwt_info["jti"],
         )
 
         return jsonify(BaseResponse().dict()), HTTPStatus.OK
@@ -151,8 +152,9 @@ def signout():
 @jwt_required()
 def signout_all():
     try:
+        access_jwt_info = get_jwt()
         auth_service.signout_all(
-            user_id=get_jwt()["sub"]["id"], access_jti=get_jwt()["jti"]
+            user_id=access_jwt_info["sub"]["id"], access_jti=access_jwt_info["jti"]
         )
 
         return jsonify(BaseResponse().dict()), HTTPStatus.OK
