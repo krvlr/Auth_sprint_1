@@ -7,6 +7,15 @@ https://github.com/krvlr/Auth_sprint_1
 
 - Сервис авторизации
 
+В рамках сервиса авторизации реализованы следующие `endpoint`-ы:
+
+- `/api/v1/signup` - регистрация пользователя,
+- `/api/v1/signin` - вход в аккаунт,
+- `/api/v1/refresh` - получение свежего `acccess` токена аутентифицированным пользователем (при наличии свежего и неиспользованного `refresh` токена),
+- `/api/v1/change/password` - изменение пароля аутентифицированного пользователя,
+- `/api/v1/signout` - выход из устройства аутентифицированным пользователем (при наличии свежего `acccess` токена),
+- `/api/v1/signout/all` - выход из устройства аутентифицированным пользователем (при наличии свежего `acccess` токена).
+
 ## Описание структуры репозитория:
 ---
 
@@ -117,3 +126,102 @@ https://github.com/krvlr/Auth_sprint_1
 Установим `pre-commit hook`:
 
     pre-commit install
+
+## Пример использования реализованных `endpoint`-ов:
+---
+
+Импорт необходимых библиотек:
+
+    import requests
+    import json
+
+### Регистрация /api/v1/signup
+
+    data = {
+        'login': 'ba',
+        'password': '12345678',
+        'email': 'test@yandex.ru'
+    }
+    port = 80
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signup',
+        json=data
+    )
+    
+    print(response, json.loads(response.text))
+
+### Вход /api/v1/signin
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signin',
+        json=data
+    )
+    
+    print(response, json.loads(response.text))
+
+    result = response.cookies.get_dict()
+
+### Обновление access токена /api/v1/refresh
+
+    refresh_cookies = {
+        "refresh_token_cookie": result["refresh_token_cookie"],
+    }
+
+    response = requests.get(
+        url=f'http://127.0.0.1:{port}/api/v1/refresh',
+        cookies=refresh_cookies,
+    )
+
+    print(response, json.loads(response.text))
+
+### Выход из устройства /api/v1/signout
+
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
+    }
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signout',
+        headers=headers,
+        json={
+            'refresh_token': result['refresh_token_cookie'],
+        }
+    )
+
+    print(response, json.loads(response.text))
+
+### Выход со всех устройств /api/v1/signout/all
+
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
+    }
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signout/all',
+        headers=headers,
+    )
+
+    print(response, json.loads(response.text))
+
+### Смена пароля /api/v1/password/change
+
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
+    }
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/password/change',
+        headers=headers,
+        json={
+            'old_password': '123456',
+            'new_password': '12345678'
+        }
+    )
+
+    response, json.loads(response.text)
+
+## CI-CD
+---
+
+TBD: В `GitHub actions` настроен запуск линтера и тестов при событии `push`.
