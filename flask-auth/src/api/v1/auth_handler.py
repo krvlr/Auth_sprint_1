@@ -1,32 +1,26 @@
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify
-from flask_jwt_extended import (
-    current_user,
-    get_jti,
-    get_jwt,
-    jwt_required,
-)
-
+from flask_jwt_extended import current_user, get_jti, get_jwt, jwt_required
 from models.auth_models import (
     AuthResponse,
+    PaginatorRequest,
     PasswordChangeRequest,
     SigninRequest,
     SignoutRequest,
     SignupRequest,
-    PaginatorRequest,
 )
 from models.common import BaseResponse
 from services.auth_service import get_auth_service
-from utils.common import get_data_from_body, set_jwt_in_cookie, get_data_from_params
+from utils.common import get_data_from_body, get_data_from_params, set_jwt_in_cookie
 from utils.exceptions import (
+    AccountHistoryException,
     AccountPasswordChangeException,
     AccountRefreshException,
     AccountSigninException,
     AccountSignoutAllException,
     AccountSignoutException,
     AccountSignupException,
-    AccountHistoryException,
 )
 from utils.user_action import log_action
 

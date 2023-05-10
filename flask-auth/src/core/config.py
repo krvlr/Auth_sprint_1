@@ -17,7 +17,7 @@ class LoggerSettings(BaseSettings):
 class FlaskSettings(BaseSettings):
     debug: bool = Field(default=True)
     host: str = Field(default="0.0.0.0")
-    port: int = Field(default="8000")
+    port: str = Field(default="8000")
 
     class Config:
         env_file = ".env"
@@ -39,7 +39,7 @@ class PostgreSettings(BaseSettings):
 
 class RedisSettings(BaseSettings):
     host: str = Field(default="127.0.0.1", env="AUTH_REDIS_HOST")
-    port: int = Field(default="6379", env="AUTH_REDIS_PORT")
+    port: str = Field(default="6379", env="AUTH_REDIS_PORT")
 
     class Config:
         env_file = ".env"

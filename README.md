@@ -98,6 +98,24 @@ https://github.com/krvlr/Auth_sprint_1
     LOGGING_LEVEL
     LOG_FORMAT
 
+создать файл `.env.tests` (в качестве примера `flask-auth/tests/functional/.env.tests.example`):
+
+    touch .env.tests
+
+указать в нем значения следующих переменных окружения:
+
+    AUTH_DB_HOST
+    AUTH_DB_PORT
+    AUTH_DB_NAME
+    AUTH_DB_USER
+    AUTH_DB_PASSWORD
+    AUTH_REDIS_HOST
+    AUTH_REDIS_PORT
+    AUTH_API_HOST
+    AUTH_API_PORT
+    AUTH_API_URI
+    AUTH_API_PROTOCOL
+
 И запустить сборку образа и запуск контейнеров для тестирования:
 
     docker compose up --build

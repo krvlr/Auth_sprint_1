@@ -1,2 +1,2 @@
-from .user import User
 from .history import UserActionsHistory
+from .user import User

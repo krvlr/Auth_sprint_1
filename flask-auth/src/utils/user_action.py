@@ -1,22 +1,23 @@
 import logging
 from functools import wraps
 from http import HTTPStatus
-
-from flask import request
-from flask.json import loads
-from flask_jwt_extended import current_user, decode_token
 from typing import Callable
-from werkzeug.http import parse_cookie
 
 from db import alchemy
 from db.models import UserActionsHistory
+from flask import request
+from flask.json import loads
+from flask_jwt_extended import current_user, decode_token
+from werkzeug.http import parse_cookie
 
 logger = logging.getLogger(__name__)
 
 
 def get_user_id_from_response_jwt(response):
     return (
-        decode_token(parse_cookie(response.headers["Set-Cookie"]).get("access_token_cookie"))
+        decode_token(
+            parse_cookie(response.headers["Set-Cookie"]).get("access_token_cookie")
+        )
         .get("sub", {})
         .get("id")
     )

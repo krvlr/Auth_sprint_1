@@ -1,9 +1,8 @@
 import uuid
 
-from sqlalchemy import UUID, Column, DateTime, func
-
 from db import alchemy
 from db.models import User
+from sqlalchemy import UUID, Column, DateTime, func
 
 
 class UserActionsHistory(alchemy.Model):

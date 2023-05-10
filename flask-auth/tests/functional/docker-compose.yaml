@@ -48,17 +48,17 @@ services:
     ports:
       - "8000:8000"
 
-  tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: tests
-    depends_on:
-      test-db-auth:
-        condition: service_healthy
-      test-redis-auth:
-        condition: service_healthy
-    env_file:
-      - .env
-    networks:
-      - test_movies_network
+#  tests:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: tests
+#    depends_on:
+#      test-db-auth:
+#        condition: service_healthy
+#      test-redis-auth:
+#        condition: service_healthy
+#    env_file:
+#      - .env
+#    networks:
+#      - test_movies_network
