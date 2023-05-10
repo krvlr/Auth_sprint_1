@@ -82,13 +82,9 @@ class AuthService:
         status = self.token_storage.get_status(user_id=user_id, jti=refresh_jti)
 
         if status == TokenStatus.NOT_FOUND:
-            raise AccountRefreshException(
-                error_message="Истек срок действия refresh токена."
-            )
+            raise AccountRefreshException(error_message="Истек срок действия refresh токена.")
         elif status == TokenStatus.BLOCKED:
-            raise AccountRefreshException(
-                error_message="Данный refresh токен более не валиден."
-            )
+            raise AccountRefreshException(error_message="Данный refresh токен более не валиден.")
 
         self.token_storage.block(user_id=user_id, jti=refresh_jti)
 
@@ -103,18 +99,14 @@ class AuthService:
     ):
         status = self.token_storage.get_status(user_id=user.id, jti=access_jti)
         if status == TokenStatus.NOT_FOUND:
-            raise AccountPasswordChangeException(
-                error_message="Истек срок действия access токена."
-            )
+            raise AccountPasswordChangeException(error_message="Истек срок действия access токена.")
         elif status == TokenStatus.BLOCKED:
             raise AccountPasswordChangeException(
                 error_message="Данный access токен более не валиден."
             )
 
         if not user.verify_password(old_password):
-            raise AccountPasswordChangeException(
-                error_message="Старый пароль введен неверно."
-            )
+            raise AccountPasswordChangeException(error_message="Старый пароль введен неверно.")
 
         user.password = new_password
         alchemy.session.commit()
@@ -123,13 +115,9 @@ class AuthService:
         access_status = self.token_storage.get_status(user_id=user_id, jti=access_jti)
 
         if access_status == TokenStatus.NOT_FOUND:
-            raise AccountSignoutException(
-                error_message="Истек срок действия access токена."
-            )
+            raise AccountSignoutException(error_message="Истек срок действия access токена.")
         elif access_status == TokenStatus.BLOCKED:
-            raise AccountSignoutException(
-                error_message="Данный access токен более не валиден."
-            )
+            raise AccountSignoutException(error_message="Данный access токен более не валиден.")
 
         self.token_storage.block(user_id=user_id, jti=access_jti)
         self.token_storage.block(user_id=user_id, jti=refresh_jti)
@@ -142,13 +130,9 @@ class AuthService:
         status = self.token_storage.get_status(user_id=user_id, jti=access_jti)
 
         if status == TokenStatus.NOT_FOUND:
-            raise AccountSignoutAllException(
-                error_message="Истек срок действия access токена."
-            )
+            raise AccountSignoutAllException(error_message="Истек срок действия access токена.")
         elif status == TokenStatus.BLOCKED:
-            raise AccountSignoutAllException(
-                error_message="Данный access токен более не валиден."
-            )
+            raise AccountSignoutAllException(error_message="Данный access токен более не валиден.")
 
         self.token_storage.block_for_pattern(pattern=f"{user_id}:*")
 
@@ -162,13 +146,9 @@ class AuthService:
         status = self.token_storage.get_status(user_id=user_id, jti=access_jti)
 
         if status == TokenStatus.NOT_FOUND:
-            raise AccountHistoryException(
-                error_message="Истек срок действия access токена."
-            )
+            raise AccountHistoryException(error_message="Истек срок действия access токена.")
         elif status == TokenStatus.BLOCKED:
-            raise AccountHistoryException(
-                error_message="Данный access токен более не валиден."
-            )
+            raise AccountHistoryException(error_message="Данный access токен более не валиден.")
 
         history = (
             UserActionsHistory.query.filter_by(user_id=user_id)

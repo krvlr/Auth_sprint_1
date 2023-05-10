@@ -12,9 +12,10 @@ https://github.com/krvlr/Auth_sprint_1
 - `/api/v1/signup` - регистрация пользователя,
 - `/api/v1/signin` - вход в аккаунт,
 - `/api/v1/refresh` - получение свежего `acccess` токена аутентифицированным пользователем (при наличии свежего и неиспользованного `refresh` токена),
-- `/api/v1/change/password` - изменение пароля аутентифицированного пользователя,
+- `/api/v1/password/change` - изменение пароля аутентифицированного пользователя,
 - `/api/v1/signout` - выход из устройства аутентифицированным пользователем (при наличии свежего `acccess` токена),
 - `/api/v1/signout/all` - выход из устройства аутентифицированным пользователем (при наличии свежего `acccess` токена).
+- `/api/v1/history` - получение списка действий текущего аутентифицированного пользователя.
 
 ## Описание структуры репозитория:
 ---
@@ -238,6 +239,19 @@ https://github.com/krvlr/Auth_sprint_1
     )
 
     response, json.loads(response.text)
+
+### История действий пользователя /api/v1/history
+
+    access_cookies = {
+        "access_token_cookie": result["access_token_cookie"],
+    }
+
+    response = requests.get(
+        url=f'http://127.0.0.1:{port}/api/v1/history',
+        cookies=access_cookies,
+    )
+
+    print(response, json.loads(response.text))
 
 ## CI-CD
 ---

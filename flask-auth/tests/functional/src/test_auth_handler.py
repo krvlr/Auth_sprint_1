@@ -19,7 +19,11 @@ import pytest
     ],
 )
 async def test_registration(
-    make_post_request, endpoint: str, data: dict, expected_answer: dict
+    # postgre_engine,
+    make_post_request,
+    endpoint: str,
+    data: dict,
+    expected_answer: dict,
 ):
     response = await make_post_request(endpoint=endpoint, data=data)
     assert response.status == expected_answer["status"]

@@ -5,6 +5,7 @@ from aiohttp import ClientSession
 
 from .settings import auth_api_settings
 
+# pytest_plugins = ["fixtures.redis", "fixtures.postgre"]
 pytest_plugins = ["fixtures.redis"]
 
 
@@ -25,9 +26,7 @@ async def session():
 
 @pytest_asyncio.fixture(scope="function")
 def make_get_request(session, redis_client):
-    async def inner(
-        endpoint: str, params: dict = None, flush_cache: bool = True
-    ) -> HttpResponse:
+    async def inner(endpoint: str, params: dict = None, flush_cache: bool = True) -> HttpResponse:
         if flush_cache:
             await redis_client.flushall()
 

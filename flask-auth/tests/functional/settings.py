@@ -9,7 +9,9 @@ class PostgreSettings(BaseSettings):
     password: str = Field(default="admin", env="AUTH_DB_PASSWORD")
 
     def get_db_uri(self) -> str:
-        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+        return (
+            f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+        )
 
     class Config:
         env_file = ".env.tests"
@@ -36,5 +38,6 @@ class AuthApiSettings(BaseSettings):
         env_file = ".env.tests"
 
 
+postgre_settings = PostgreSettings()
 redis_settings = RedisSettings()
 auth_api_settings = AuthApiSettings()
