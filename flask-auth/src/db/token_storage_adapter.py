@@ -1,13 +1,13 @@
-import abc
-from abc import ABCMeta
+from abc import ABC, abstractmethod
 from datetime import timedelta
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Union
+
+from redis import Redis
+from typing import Union
 
 from core.config import redis_settings
 from db.token_storage_provider import TokenStorageProvider, TokenStorageRedisProvider
-from redis import Redis
 
 
 class TokenStatus(Enum):
@@ -16,31 +16,31 @@ class TokenStatus(Enum):
     NOT_FOUND = None
 
 
-class TokenStorageAdapter(metaclass=ABCMeta):
-    @abc.abstractmethod
+class TokenStorageAdapter(ABC):
+    @abstractmethod
     def __init__(self, token_storage_provider: TokenStorageProvider):
         self.token_storage_provider = token_storage_provider
 
-    @abc.abstractmethod
+    @abstractmethod
     def create(self, user_id: str, jti: str, delta_expire: Union[int, timedelta]):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_status(self, user_id: str, jti: str) -> TokenStatus:
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def block(self, user_id: str, jti: str):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def block_for_pattern(self, pattern: str):
         pass
 
 
 class TokenStorageRedisAdapter(TokenStorageAdapter):
     def __init__(self, token_storage_provider: TokenStorageProvider):
-        self.token_storage_provider = token_storage_provider
+        super().__init__(token_storage_provider)
 
     @staticmethod
     def _generate_key(user_id: str, jti: str):

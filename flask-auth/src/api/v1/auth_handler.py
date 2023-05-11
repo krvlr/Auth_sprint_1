@@ -24,11 +24,11 @@ from utils.exceptions import (
 )
 from utils.user_action import log_action
 
-account_bp = Blueprint("auth", __name__)
+auth_bp = Blueprint("auth", __name__)
 auth_service = get_auth_service()
 
 
-@account_bp.route("/api/v1/signup", methods=["POST"])
+@auth_bp.route("/api/v1/signup", methods=["POST"])
 @log_action
 def signup():
     try:
@@ -47,7 +47,7 @@ def signup():
         )
 
 
-@account_bp.route("/api/v1/signin", methods=["POST"])
+@auth_bp.route("/api/v1/signin", methods=["POST"])
 @log_action
 def signin():
     try:
@@ -75,7 +75,7 @@ def signin():
         )
 
 
-@account_bp.route("/api/v1/refresh", methods=["GET"])
+@auth_bp.route("/api/v1/refresh", methods=["GET"])
 @jwt_required(refresh=True)
 @log_action
 def refresh():
@@ -105,7 +105,7 @@ def refresh():
         )
 
 
-@account_bp.route("/api/v1/password/change", methods=["POST"])
+@auth_bp.route("/api/v1/password/change", methods=["POST"])
 @jwt_required()
 @log_action
 def password_change():
@@ -129,7 +129,7 @@ def password_change():
         )
 
 
-@account_bp.route("/api/v1/signout", methods=["POST"])
+@auth_bp.route("/api/v1/signout", methods=["POST"])
 @jwt_required()
 @log_action
 def signout():
@@ -149,7 +149,7 @@ def signout():
         )
 
 
-@account_bp.route("/api/v1/signout/all", methods=["POST"])
+@auth_bp.route("/api/v1/signout/all", methods=["POST"])
 @jwt_required()
 @log_action
 def signout_all():
@@ -164,7 +164,7 @@ def signout_all():
         )
 
 
-@account_bp.route("/api/v1/history", methods=["GET"])
+@auth_bp.route("/api/v1/history", methods=["GET"])
 @jwt_required()
 def history():
     try:
@@ -184,6 +184,6 @@ def history():
         )
 
 
-@account_bp.route("/api/v1/health", methods=["GET"])
+@auth_bp.route("/api/v1/health", methods=["GET"])
 def health_check():
     return jsonify(BaseResponse().dict()), HTTPStatus.OK

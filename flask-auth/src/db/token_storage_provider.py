@@ -1,25 +1,24 @@
-import abc
-from abc import ABCMeta
+from abc import ABC, abstractmethod
 from datetime import timedelta
-from typing import Any, Union
 
 from redis import Redis
+from typing import Any, Union
 
 
-class TokenStorageProvider(metaclass=ABCMeta):
-    @abc.abstractmethod
+class TokenStorageProvider(ABC):
+    @abstractmethod
     def get(self, key: str):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def set(self, key: str, value: Any, delta_expire: Union[int, timedelta]):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def update(self, key: str, value: Any):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def search(self, pattern: str):
         pass
 

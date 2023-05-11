@@ -1,5 +1,7 @@
-from db.models import User
 from gevent import monkey
+
+from db.models import User
+from utils.exceptions import add_base_exceptions_handlers
 
 monkey.patch_all()
 
@@ -25,6 +27,8 @@ def create_app():
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=jwt_settings.access_token_expires)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(hours=jwt_settings.refresh_token_expires)
 
+    add_base_exceptions_handlers(app)
+
     jwt = JWTManager(app)
 
     @jwt.user_lookup_loader
@@ -37,7 +41,7 @@ def create_app():
 
 
 app = create_app()
-app.register_blueprint(auth_handler.account_bp)
+app.register_blueprint(auth_handler.auth_bp)
 
 if __name__ == "__main__":
     app.run(

@@ -1,3 +1,30 @@
+import traceback
+from http import HTTPStatus
+
+from flask import jsonify
+from werkzeug.exceptions import UnprocessableEntity
+
+from models.common import BaseResponse
+
+
+def add_base_exceptions_handlers(app):
+    @app.errorhandler(UnprocessableEntity)
+    def unprocessable_entity_exception(ex: UnprocessableEntity):
+        app.logger.error(msg=ex.description)
+        return (
+            jsonify(BaseResponse(success=False, error="Ошибка формата входных данных.").dict()),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    @app.errorhandler(Exception)
+    def handle_exception(ex):
+        app.logger.error(msg=traceback.format_exc())
+        return (
+            jsonify(BaseResponse(success=False, error="Неизвестная ошибка.").dict()),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+
 class AccountSignupException(Exception):
     def __init__(self, error_message: str):
         self.error_message = f"Ошибка регистрации пользователя. {error_message}"
