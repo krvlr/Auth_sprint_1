@@ -26,10 +26,11 @@ async def session():
 
 @pytest_asyncio.fixture(scope="function")
 def make_get_request(session, redis_client):
-    async def inner(endpoint: str, headers: dict = {}, flush_cache: bool = True) -> HttpResponse:
+    async def inner(endpoint: str, token: str = None, flush_cache: bool = True) -> HttpResponse:
         if flush_cache:
             await redis_client.flushall()
 
+        headers = {"Authorization": f"Bearer {token}"}
         url = f"{auth_api_settings.get_api_uri()}/{endpoint}"
 
         async with session.get(url, headers=headers) as response:
