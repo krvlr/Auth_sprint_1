@@ -45,20 +45,28 @@ services:
       - .env
     networks:
       - test_movies_network
+    healthcheck:
+      test: curl --fail http://127.0.0.1:8000/api/v1/health || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
     ports:
       - "8000:8000"
 
-#  tests:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    container_name: tests
-#    depends_on:
-#      test-db-auth:
-#        condition: service_healthy
-#      test-redis-auth:
-#        condition: service_healthy
-#    env_file:
-#      - .env
-#    networks:
-#      - test_movies_network
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tests
+    depends_on:
+      test-db-auth:
+        condition: service_healthy
+      test-redis-auth:
+        condition: service_healthy
+      api-auth:
+        condition: service_healthy
+    env_file:
+      - .env.tests
+    networks:
+      - test_movies_network

@@ -1,7 +1,5 @@
-from contextlib import contextmanager
+from http.cookies import SimpleCookie
 
 
-@contextmanager
-def conn_context(conn):
-    yield conn
-    conn.close()
+def get_cookies(simple_cookies: SimpleCookie, filters: list) -> dict:
+    return {key: value.value for key, value in simple_cookies.items() if key in filters}

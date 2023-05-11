@@ -7,11 +7,15 @@ class PostgreSettings(BaseSettings):
     name: str = Field(default="auth_database", env="AUTH_DB_NAME")
     user: str = Field(default="admin", env="AUTH_DB_USER")
     password: str = Field(default="admin", env="AUTH_DB_PASSWORD")
+    tables: str = Field(default="users, user_actions_history", env="AUTH_DB_TABLES")
 
     def get_db_uri(self) -> str:
         return (
             f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
         )
+
+    def get_tables(self) -> list:
+        return self.tables.split(", ")
 
     class Config:
         env_file = ".env.tests"

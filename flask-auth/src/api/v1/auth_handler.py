@@ -182,3 +182,8 @@ def history():
             jsonify(BaseResponse(success=False, error=error.error_message).dict()),
             HTTPStatus.BAD_REQUEST,
         )
+
+
+@account_bp.route("/api/v1/health", methods=["GET"])
+def health_check():
+    return jsonify(BaseResponse().dict()), HTTPStatus.OK

@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 
 import pytest_asyncio
@@ -5,8 +6,7 @@ from aiohttp import ClientSession
 
 from .settings import auth_api_settings
 
-# pytest_plugins = ["fixtures.redis", "fixtures.postgre"]
-pytest_plugins = ["fixtures.redis"]
+pytest_plugins = ["fixtures.redis", "fixtures.postgre"]
 
 
 @dataclass
@@ -26,19 +26,19 @@ async def session():
 
 @pytest_asyncio.fixture(scope="function")
 def make_get_request(session, redis_client):
-    async def inner(endpoint: str, params: dict = None, flush_cache: bool = True) -> HttpResponse:
+    async def inner(endpoint: str, headers: dict = {}, flush_cache: bool = True) -> HttpResponse:
         if flush_cache:
             await redis_client.flushall()
 
         url = f"{auth_api_settings.get_api_uri()}/{endpoint}"
 
-        async with session.get(url, params=params) as response:
-            body = await response.json()
+        async with session.get(url, headers=headers) as response:
+            body = await response.read()
             return HttpResponse(
                 status=response.status,
                 headers=response.headers,
                 cookies=response.cookies,
-                body=body,
+                body=json.loads(body),
             )
 
     return inner
