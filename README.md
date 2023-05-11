@@ -110,6 +110,7 @@ https://github.com/krvlr/Auth_sprint_1
     AUTH_DB_NAME
     AUTH_DB_USER
     AUTH_DB_PASSWORD
+    AUTH_DB_TABLES
     AUTH_REDIS_HOST
     AUTH_REDIS_PORT
     AUTH_API_HOST

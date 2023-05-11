@@ -36,7 +36,7 @@ class AuthApiSettings(BaseSettings):
     protocol: str = Field(default="http", env="AUTH_API_PROTOCOL")
 
     def get_api_uri(self) -> str:
-        return f"{self.protocol}://{self.host}:{self.port}/{self.uri}"
+        return f"{self.protocol}://{self.host}:{self.port}{self.uri}"
 
     class Config:
         env_file = ".env.tests"

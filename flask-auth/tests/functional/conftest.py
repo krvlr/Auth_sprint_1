@@ -14,7 +14,7 @@ class HttpResponse:
     status: int
     headers: dict
     cookies: dict
-    body: str
+    body: dict
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -56,12 +56,12 @@ def make_post_request(session, redis_client):
         url = f"{auth_api_settings.get_api_uri()}/{endpoint}"
 
         async with session.post(url, json=data, headers=headers) as response:
-            body = await response.json()
+            body = await response.read()
             return HttpResponse(
                 status=response.status,
                 headers=response.headers,
                 cookies=response.cookies,
-                body=body,
+                body=json.loads(body),
             )
 
     return inner
