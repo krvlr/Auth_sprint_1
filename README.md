@@ -7,6 +7,16 @@ https://github.com/krvlr/Auth_sprint_1
 
 - Сервис авторизации
 
+В рамках сервиса авторизации реализованы следующие `endpoint`-ы:
+
+- `/api/v1/signup` - регистрация пользователя,
+- `/api/v1/signin` - вход в аккаунт,
+- `/api/v1/refresh` - получение свежего `acccess` токена аутентифицированным пользователем (при наличии свежего и неиспользованного `refresh` токена),
+- `/api/v1/password/change` - изменение пароля аутентифицированного пользователя,
+- `/api/v1/signout` - выход из устройства аутентифицированным пользователем (при наличии свежего `acccess` токена),
+- `/api/v1/signout/all` - выход из устройства аутентифицированным пользователем (при наличии свежего `acccess` токена).
+- `/api/v1/history` - получение списка действий текущего аутентифицированного пользователя.
+
 ## Описание структуры репозитория:
 ---
 
@@ -89,6 +99,25 @@ https://github.com/krvlr/Auth_sprint_1
     LOGGING_LEVEL
     LOG_FORMAT
 
+создать файл `.env.tests` (в качестве примера `flask-auth/tests/functional/.env.tests.example`):
+
+    touch .env.tests
+
+указать в нем значения следующих переменных окружения:
+
+    AUTH_DB_HOST
+    AUTH_DB_PORT
+    AUTH_DB_NAME
+    AUTH_DB_USER
+    AUTH_DB_PASSWORD
+    AUTH_DB_TABLES
+    AUTH_REDIS_HOST
+    AUTH_REDIS_PORT
+    AUTH_API_HOST
+    AUTH_API_PORT
+    AUTH_API_URI
+    AUTH_API_PROTOCOL
+
 И запустить сборку образа и запуск контейнеров для тестирования:
 
     docker compose up --build
@@ -117,3 +146,115 @@ https://github.com/krvlr/Auth_sprint_1
 Установим `pre-commit hook`:
 
     pre-commit install
+
+## Пример использования реализованных `endpoint`-ов:
+---
+
+Импорт необходимых библиотек:
+
+    import requests
+    import json
+
+### Регистрация /api/v1/signup
+
+    data = {
+        'login': 'ba',
+        'password': '12345678',
+        'email': 'test@yandex.ru'
+    }
+    port = 80
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signup',
+        json=data
+    )
+    
+    print(response, json.loads(response.text))
+
+### Вход /api/v1/signin
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signin',
+        json=data
+    )
+    
+    print(response, json.loads(response.text))
+
+    result = response.cookies.get_dict()
+
+### Обновление access токена /api/v1/refresh
+
+    refresh_cookies = {
+        "refresh_token_cookie": result["refresh_token_cookie"],
+    }
+
+    response = requests.get(
+        url=f'http://127.0.0.1:{port}/api/v1/refresh',
+        cookies=refresh_cookies,
+    )
+
+    print(response, json.loads(response.text))
+
+### Выход из устройства /api/v1/signout
+
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
+    }
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signout',
+        headers=headers,
+        json={
+            'refresh_token': result['refresh_token_cookie'],
+        }
+    )
+
+    print(response, json.loads(response.text))
+
+### Выход со всех устройств /api/v1/signout/all
+
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
+    }
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/signout/all',
+        headers=headers,
+    )
+
+    print(response, json.loads(response.text))
+
+### Смена пароля /api/v1/password/change
+
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
+    }
+
+    response = requests.post(
+        url=f'http://127.0.0.1:{port}/api/v1/password/change',
+        headers=headers,
+        json={
+            'old_password': '123456',
+            'new_password': '12345678'
+        }
+    )
+
+    response, json.loads(response.text)
+
+### История действий пользователя /api/v1/history
+
+    access_cookies = {
+        "access_token_cookie": result["access_token_cookie"],
+    }
+
+    response = requests.get(
+        url=f'http://127.0.0.1:{port}/api/v1/history',
+        cookies=access_cookies,
+    )
+
+    print(response, json.loads(response.text))
+
+## CI-CD
+---
+
+TBD: В `GitHub actions` настроен запуск линтера и тестов при событии `push`.

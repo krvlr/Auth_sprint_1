@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr, Field, validator
-
 from utils.exceptions import AccountPasswordChangeException, AccountSignupException
 
 

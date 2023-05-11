@@ -20,27 +20,21 @@ def upgrade():
     op.create_table(
         "user_actions_history",
         sa.Column("id", sa.UUID(), nullable=False, comment="Идентификатор записи"),
-        sa.Column(
-            "user_id", sa.UUID(), nullable=False, comment="Идентификатор пользователя"
-        ),
+        sa.Column("user_id", sa.UUID(), nullable=False, comment="Идентификатор пользователя"),
         sa.Column(
             "action",
             sa.String(length=255),
             nullable=False,
             comment="Действие пользователя",
         ),
-        sa.Column(
-            "ip", sa.String(length=45), nullable=False, comment="IP пользователя"
-        ),
+        sa.Column("ip", sa.String(length=45), nullable=False, comment="IP пользователя"),
         sa.Column(
             "device_info",
             sa.String(length=255),
             nullable=True,
             comment="Информация о устройстве",
         ),
-        sa.Column(
-            "created", sa.DateTime(), nullable=False, comment="Время создания записи"
-        ),
+        sa.Column("created", sa.DateTime(), nullable=False, comment="Время создания записи"),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.id"],

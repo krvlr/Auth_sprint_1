@@ -17,7 +17,7 @@ class LoggerSettings(BaseSettings):
 class FlaskSettings(BaseSettings):
     debug: bool = Field(default=True)
     host: str = Field(default="0.0.0.0")
-    port: int = Field(default="8000")
+    port: str = Field(default="8000")
 
     class Config:
         env_file = ".env"
@@ -39,7 +39,7 @@ class PostgreSettings(BaseSettings):
 
 class RedisSettings(BaseSettings):
     host: str = Field(default="127.0.0.1", env="AUTH_REDIS_HOST")
-    port: int = Field(default="6379", env="AUTH_REDIS_PORT")
+    port: str = Field(default="6379", env="AUTH_REDIS_PORT")
 
     class Config:
         env_file = ".env"
@@ -48,9 +48,7 @@ class RedisSettings(BaseSettings):
 class JWTSettings(BaseSettings):
     cookie_secure: str = Field(default="False", repr=False, env="JWT_COOKIE_SECURE")
     token_location: str = Field(default="cookies", repr=False, env="JWT_TOKEN_LOCATION")
-    secret_key: str = Field(
-        default="SUPER-SECRET-KEY", repr=False, env="JWT_SECRET_KEY"
-    )
+    secret_key: str = Field(default="SUPER-SECRET-KEY", repr=False, env="JWT_SECRET_KEY")
     access_token_expires: int = Field(default=1, env="JWT_ACCESS_TOKEN_EXPIRES")
     refresh_token_expires: int = Field(default=30, env="JWT_REFRESH_TOKEN_EXPIRES")
 

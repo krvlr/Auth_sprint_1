@@ -10,9 +10,7 @@ class AccountSigninException(Exception):
 
 class AccountRefreshException(Exception):
     def __init__(self, error_message: str):
-        self.error_message = (
-            f"Ошибка при попытке воспользоваться refresh токеном. {error_message}"
-        )
+        self.error_message = f"Ошибка при попытке воспользоваться refresh токеном. {error_message}"
 
 
 class AccountPasswordChangeException(Exception):
@@ -27,11 +25,11 @@ class AccountSignoutException(Exception):
 
 class AccountSignoutAllException(Exception):
     def __init__(self, error_message: str):
-        self.error_message = (
-            f"Ошибка при попытке выйти со всех устройств аккаунта. {error_message}"
-        )
+        self.error_message = f"Ошибка при попытке выйти со всех устройств аккаунта. {error_message}"
 
 
 class AccountHistoryException(Exception):
     def __init__(self, error_message: str):
-        self.error_message = f"Ошибка при попытке получения истории действий пользователя. {error_message}"
+        self.error_message = (
+            f"Ошибка при попытке получения истории действий пользователя. {error_message}"
+        )

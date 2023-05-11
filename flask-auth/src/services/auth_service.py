@@ -1,20 +1,19 @@
 from functools import lru_cache
 
-from flask import current_app, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
-
 from db import alchemy
 from db.models import UserActionsHistory
 from db.models.user import User
 from db.token_storage_adapter import TokenStatus, TokenStorageAdapter, get_redis_adapter
+from flask import current_app, request
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
 from utils.exceptions import (
+    AccountHistoryException,
     AccountPasswordChangeException,
     AccountRefreshException,
     AccountSigninException,
     AccountSignoutAllException,
     AccountSignoutException,
     AccountSignupException,
-    AccountHistoryException,
 )
 
 

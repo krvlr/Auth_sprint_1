@@ -1,6 +1,7 @@
+from typing import Any, Type
+
 from flask import abort, current_app, jsonify, request
 from pydantic import BaseModel, ValidationError
-from typing import Any, Type
 
 
 def get_data_from_body(request_model: Type[BaseModel]) -> Any:
