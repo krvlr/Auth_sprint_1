@@ -188,7 +188,7 @@ https://github.com/krvlr/Auth_sprint_1
         "refresh_token_cookie": result["refresh_token_cookie"],
     }
 
-    response = requests.get(
+    response = requests.post(
         url=f'http://127.0.0.1:{port}/api/v1/refresh',
         cookies=refresh_cookies,
     )
@@ -243,13 +243,13 @@ https://github.com/krvlr/Auth_sprint_1
 
 ### История действий пользователя /api/v1/history
 
-    access_cookies = {
-        "access_token_cookie": result["access_token_cookie"],
+    headers = {
+        "Authorization": f"Bearer {result['access_token_cookie']}",
     }
 
     response = requests.get(
         url=f'http://127.0.0.1:{port}/api/v1/history',
-        cookies=access_cookies,
+        headers=headers,
     )
 
     print(response, json.loads(response.text))

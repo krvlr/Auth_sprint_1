@@ -1,9 +1,9 @@
 from gevent import monkey
 
+monkey.patch_all()
+
 from db.models import User
 from utils.exceptions import add_base_exceptions_handlers
-
-monkey.patch_all()
 
 import logging.config
 from datetime import timedelta
@@ -12,14 +12,18 @@ from api.v1 import auth_handler
 from core.config import flask_settings, jwt_settings
 from core.logger import LOGGER_CONFIG
 from db import init_db
-from flask import Flask
+from flask import Flask, request
 from flask_jwt_extended import JWTManager
+from flasgger import Swagger, LazyString, LazyJSONEncoder
+from config.swagger import template, swagger_config
 
 logging.config.dictConfig(LOGGER_CONFIG)
 
 
 def create_app():
     app = Flask(__name__)
+
+    Swagger(app, template=template, config=swagger_config)
 
     app.config["JWT_COOKIE_SECURE"] = jwt_settings.cookie_secure
     app.config["JWT_TOKEN_LOCATION"] = jwt_settings.token_location.split(", ")

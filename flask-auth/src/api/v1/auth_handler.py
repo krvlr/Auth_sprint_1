@@ -23,6 +23,7 @@ from utils.exceptions import (
     AccountSignupException,
 )
 from utils.user_action import log_action
+from flasgger import swag_from
 
 auth_bp = Blueprint("auth", __name__)
 auth_service = get_auth_service()
@@ -30,6 +31,7 @@ auth_service = get_auth_service()
 
 @auth_bp.route("/api/v1/signup", methods=["POST"])
 @log_action
+@swag_from("docs/auth/signup.yaml")
 def signup():
     try:
         body = get_data_from_body(SignupRequest)
@@ -49,6 +51,7 @@ def signup():
 
 @auth_bp.route("/api/v1/signin", methods=["POST"])
 @log_action
+@swag_from("docs/auth/signin.yaml")
 def signin():
     try:
         body = get_data_from_body(SigninRequest)
@@ -59,7 +62,7 @@ def signin():
             )
         )
 
-        response = jsonify(BaseResponse().dict())
+        response = jsonify(BaseResponse(data=dict(auth_data)).dict())
 
         set_jwt_in_cookie(
             response=response,
@@ -75,9 +78,10 @@ def signin():
         )
 
 
-@auth_bp.route("/api/v1/refresh", methods=["GET"])
+@auth_bp.route("/api/v1/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 @log_action
+@swag_from("docs/auth/refresh.yaml")
 def refresh():
     try:
         refresh_jwt_info = get_jwt()
@@ -89,7 +93,7 @@ def refresh():
             )
         )
 
-        response = jsonify(BaseResponse().dict())
+        response = jsonify(BaseResponse(data=dict(auth_data)).dict())
 
         set_jwt_in_cookie(
             response=response,
@@ -108,6 +112,7 @@ def refresh():
 @auth_bp.route("/api/v1/password/change", methods=["POST"])
 @jwt_required()
 @log_action
+@swag_from("docs/auth/password_change.yaml")
 def password_change():
     try:
         body = get_data_from_body(PasswordChangeRequest)
@@ -132,9 +137,11 @@ def password_change():
 @auth_bp.route("/api/v1/signout", methods=["POST"])
 @jwt_required()
 @log_action
+@swag_from("docs/auth/signout.yaml")
 def signout():
     try:
         body = get_data_from_body(SignoutRequest)
+
         auth_service.signout(
             user_id=current_user.id,
             refresh_jti=get_jti(body.refresh_token),
@@ -152,6 +159,7 @@ def signout():
 @auth_bp.route("/api/v1/signout/all", methods=["POST"])
 @jwt_required()
 @log_action
+@swag_from("docs/auth/signout_all.yaml")
 def signout_all():
     try:
         auth_service.signout_all(user_id=current_user.id, access_jti=get_jwt()["jti"])
@@ -166,6 +174,7 @@ def signout_all():
 
 @auth_bp.route("/api/v1/history", methods=["GET"])
 @jwt_required()
+@swag_from("docs/auth/history.yaml")
 def history():
     try:
         paginator = get_data_from_params(PaginatorRequest)

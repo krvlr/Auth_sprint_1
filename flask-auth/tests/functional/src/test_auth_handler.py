@@ -180,7 +180,7 @@ async def test_refresh(make_post_request, make_get_request, postgre_engine, case
 
     for case in cases["refresh"]:
         refresh_token_cookie = user_cookies[case["login"]]["refresh_token_cookie"]
-        response = await make_get_request(
+        response = await make_post_request(
             endpoint="refresh", token=refresh_token_cookie, flush_cache=False
         )
         assert response.status == case["response"]["status"]
@@ -270,7 +270,7 @@ async def test_signout(make_post_request, make_get_request, postgre_engine, case
 
     for case in cases["refresh"]:
         refresh_token_cookie = user_cookies[case["login"]]["refresh_token_cookie"]
-        response = await make_get_request(
+        response = await make_post_request(
             endpoint="refresh", token=refresh_token_cookie, flush_cache=False
         )
         assert response.status == case["response"]["status"]
@@ -360,7 +360,7 @@ async def test_signout_all(make_post_request, make_get_request, postgre_engine, 
     for case in cases["refresh"]:
         for cookies in user_cookies[case["login"]]:
             refresh_token_cookie = cookies["refresh_token_cookie"]
-            response = await make_get_request(
+            response = await make_post_request(
                 endpoint="refresh", token=refresh_token_cookie, flush_cache=False
             )
             assert response.status == case["response"]["status"]
