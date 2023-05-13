@@ -2,16 +2,16 @@ from gevent import monkey
 
 monkey.patch_all()
 
-from db.models import User
+from db.models.user import User, Role
 from utils.exceptions import add_base_exceptions_handlers
 
 import logging.config
 from datetime import timedelta
 
 from api.v1 import auth_handler
-from core.config import flask_settings, jwt_settings
+from core.config import flask_settings, jwt_settings, role_settings
 from core.logger import LOGGER_CONFIG
-from db import init_db
+from db import init_db, alchemy
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger, LazyString, LazyJSONEncoder
@@ -46,6 +46,20 @@ def create_app():
 
 app = create_app()
 app.register_blueprint(auth_handler.auth_bp)
+
+
+# вот это надо вытащить в отдельную функцию
+# и вызывать ее при старте приложения до первого request
+# @app.before_first_request - нашел вот такой декоратор
+# app.app_context().push()
+# alchemy.create_all()
+# for role_name in role_settings.initial_user_roles.split(', '):
+#     role = Role(name=role_name, description=role_name)
+#     alchemy.session.add(role)
+# alchemy.session.commit()
+# но сейчас вылетает ошибка
+# DETAIL:  Key (name)=(default) already exists.
+
 
 if __name__ == "__main__":
     app.run(

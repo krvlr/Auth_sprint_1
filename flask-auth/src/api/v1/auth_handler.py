@@ -87,7 +87,7 @@ def refresh():
         refresh_jwt_info = get_jwt()
         auth_data = AuthResponse(
             **auth_service.refresh(
-                user_id=refresh_jwt_info["sub"]["id"],
+                user=current_user,
                 device_info=refresh_jwt_info["sub"]["device_info"],
                 refresh_jti=refresh_jwt_info["jti"],
             )

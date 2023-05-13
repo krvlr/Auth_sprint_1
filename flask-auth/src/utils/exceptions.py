@@ -2,7 +2,7 @@ import traceback
 from http import HTTPStatus
 
 from flask import jsonify
-from werkzeug.exceptions import UnprocessableEntity
+from werkzeug.exceptions import UnprocessableEntity, UnsupportedMediaType
 
 from models.common import BaseResponse
 
@@ -13,6 +13,14 @@ def add_base_exceptions_handlers(app):
         app.logger.error(msg=ex.description)
         return (
             jsonify(BaseResponse(success=False, error="Ошибка формата входных данных.").dict()),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    @app.errorhandler(UnsupportedMediaType)
+    def unprocessable_media_type(ex: UnsupportedMediaType):
+        app.logger.error(msg=ex.description)
+        return (
+            jsonify(BaseResponse(success=False, error="Ошибка состава запроса.").dict()),
             HTTPStatus.BAD_REQUEST,
         )
 

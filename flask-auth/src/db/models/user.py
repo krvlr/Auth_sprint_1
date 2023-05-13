@@ -2,7 +2,17 @@ import uuid
 
 from db import alchemy
 from flask_bcrypt import check_password_hash, generate_password_hash
-from sqlalchemy import UUID, Boolean, Column, DateTime, String, func
+from sqlalchemy import (
+    UUID,
+    Boolean,
+    Column,
+    DateTime,
+    String,
+    func,
+    ForeignKey,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import relationship
 
 
 class User(alchemy.Model):
@@ -48,6 +58,7 @@ class User(alchemy.Model):
         comment="Признак верифицированного пользователя",
     )
     is_admin = Column(Boolean, nullable=False, comment="Признак администратора")
+    roles = relationship("Role", secondary="user_role", back_populates="users")
 
     def __repr__(self):
         return f"<User: {self.login}>"
@@ -64,6 +75,9 @@ class User(alchemy.Model):
         if not password:
             return False
         return check_password_hash(self.password_hash, password)
+
+    def get_roles(self):
+        return [role.name for role in self.roles]
 
     def to_dict(self):
         return dict(
@@ -90,22 +104,22 @@ class UserActionsHistory(alchemy.Model):
     )
     user_id = Column(
         UUID(as_uuid=True),
-        alchemy.ForeignKey(User.id, ondelete="CASCADE"),
+        ForeignKey(User.id, ondelete="CASCADE"),
         nullable=False,
         comment="Идентификатор пользователя",
     )
     action = Column(
-        alchemy.String(255),
+        String(255),
         nullable=False,
         comment="Действие пользователя",
     )
     ip = Column(
-        alchemy.String(45),
+        String(45),
         nullable=False,
         comment="IP пользователя",
     )
     device_info = Column(
-        alchemy.String(255),
+        String(255),
         primary_key=False,
         comment="Информация о устройстве",
     )
@@ -128,3 +142,46 @@ class UserActionsHistory(alchemy.Model):
             device_info=self.device_info,
             created=self.created,
         )
+
+
+class Role(alchemy.Model):
+    __tablename__ = "roles"
+
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        unique=True,
+        nullable=False,
+        comment="Идентификатор роли",
+    )
+    name = Column(String(72), unique=True, nullable=False, comment="Название роли")
+    description = Column(String(255), nullable=False, comment="Описание роли")
+    users = relationship("User", secondary="user_role", back_populates="roles")
+
+    def __repr__(self):
+        return f"<Role: {self.name}>"
+
+
+class UserRole(alchemy.Model):
+    __tablename__ = "user_role"
+    __table_args__ = (UniqueConstraint("user_id", "role_id"),)
+
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        unique=True,
+        nullable=False,
+        comment="Идентификатор связи пользователя с его ролью",
+    )
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey(User.id, ondelete="CASCADE"),
+        comment="Идентификатор пользователя",
+    )
+    role_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey(Role.id, ondelete="CASCADE"),
+        comment="Идентификатор роли",
+    )

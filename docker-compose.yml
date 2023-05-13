@@ -25,8 +25,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432" # TODO: remove
 
   redis-auth:
     image: redis:7.0.8-alpine
@@ -38,8 +38,8 @@ services:
       - movies_network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-    expose:
-      - "6379"
+    ports:
+      - "6379:6379" # TODO: remove
 
   api-auth:
     build:
@@ -62,8 +62,8 @@ services:
       retries: 3
     networks:
       - movies_network
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000" # TODO: remove
 
   nginx:
     image: nginx:1.23.1-alpine

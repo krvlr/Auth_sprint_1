@@ -56,3 +56,12 @@ class PasswordChangeRequest(BaseModel):
 class PaginatorRequest(BaseModel):
     page_num: int = Field(default=1, title="Номер страницы", ge=1)
     page_size: int = Field(default=20, title="Размер страницы", ge=1, le=50)
+
+
+class JwtPayload(BaseModel):
+    id: str = Field(..., title="Идентификатор пользователя")
+    device_info: str = Field(..., title="Информация о устройстве")
+    is_active: str = Field(..., title="Признак активного пользователя")
+    is_verified: str = Field(..., title="Признак верифицированного пользователя")
+    is_admin: str = Field(..., title="Признак администратора")
+    roles: list = Field(..., title="Список ролей пользователя")

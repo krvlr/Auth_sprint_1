@@ -56,8 +56,14 @@ class JWTSettings(BaseSettings):
         env_file = ".env"
 
 
+class RoleSettings(BaseSettings):
+    default_user_role: str = Field(default="default", env="DEFAULT_USER_ROLE")
+    initial_user_roles: str = Field(default="default, prime", env="INITIAL_USER_ROLES")
+
+
 logger_settings = LoggerSettings()
 flask_settings = FlaskSettings()
 postgre_settings = PostgreSettings()
 redis_settings = RedisSettings()
 jwt_settings = JWTSettings()
+role_settings = RoleSettings()
