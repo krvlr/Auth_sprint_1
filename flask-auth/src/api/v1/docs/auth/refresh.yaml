@@ -16,3 +16,5 @@ responses:
     description: Пользователь успешно обновил Access токен.
   400:
     description: Произошла ошибка при попытке обновить Access токен.
+  422:
+    description: Произошла ошибка валидации Refresh токена.

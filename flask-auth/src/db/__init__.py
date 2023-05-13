@@ -1,5 +1,5 @@
 from core.config import MIGRATION_DIR, postgre_settings
-from flask import Flask
+from flask import Flask, current_app
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
@@ -20,3 +20,5 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_DATABASE_URI"] = postgre_settings.get_db_uri()
     alchemy.init_app(app)
     Migrate(app, alchemy, MIGRATION_DIR)
+
+    from db.models.user import User, Role, UserActionsHistory
