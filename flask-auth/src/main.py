@@ -48,20 +48,28 @@ app = create_app()
 app.register_blueprint(auth_handler.auth_bp)
 
 
-# вот это надо вытащить в отдельную функцию
-# и вызывать ее при старте приложения до первого request
-# @app.before_first_request - нашел вот такой декоратор
-# app.app_context().push()
+app.app_context().push()
+# это можно было использовать вместо alembic миграций
+# что в свою очередь сэкономило бы тонну времени
 # alchemy.create_all()
-# for role_name in role_settings.initial_user_roles.split(', '):
-#     role = Role(name=role_name, description=role_name)
-#     alchemy.session.add(role)
-# alchemy.session.commit()
-# но сейчас вылетает ошибка
-# DETAIL:  Key (name)=(default) already exists.
+
+
+@app.before_first_request
+def initial_create():
+    for role_name, role_description in role_settings.get_initial_roles():
+        # функциональности по upsert в sqlalchemy не нашел
+        # если честно так и не понял в чем кайф всех этих миграций
+        # кучи времени на описание таблиц,
+        # поисков зацикленных ипортов,
+        # когда есть psycopg2 и SQL
+        if not Role.query.filter_by(name=role_name).first():
+            role = Role(name=role_name, description=role_description)
+            alchemy.session.add(role)
+            alchemy.session.commit()
 
 
 if __name__ == "__main__":
+    initial_create()
     app.run(
         host=flask_settings.host,
         port=flask_settings.port,

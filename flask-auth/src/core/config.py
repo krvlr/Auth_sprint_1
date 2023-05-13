@@ -58,7 +58,19 @@ class JWTSettings(BaseSettings):
 
 class RoleSettings(BaseSettings):
     default_user_role: str = Field(default="default", env="DEFAULT_USER_ROLE")
-    initial_user_roles: str = Field(default="default, prime", env="INITIAL_USER_ROLES")
+    initial_user_roles: str = Field(default="default", env="INITIAL_USER_ROLES")
+    initial_user_descrition_roles: str = Field(
+        default="Base rights for a registered user", env="INITIAL_USER_DESCRIPTION_ROLES"
+    )
+
+    def get_initial_roles(self):
+        for role, descrition in zip(
+            self.initial_user_roles.split(", "), self.initial_user_descrition_roles.split(", ")
+        ):
+            yield role, descrition
+
+    class Config:
+        env_file = ".env"
 
 
 logger_settings = LoggerSettings()
