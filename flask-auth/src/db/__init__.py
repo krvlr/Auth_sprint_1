@@ -20,5 +20,3 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_DATABASE_URI"] = postgre_settings.get_db_uri()
     alchemy.init_app(app)
     Migrate(app, alchemy, MIGRATION_DIR)
-
-    from db.models.user import User, Role, UserActionsHistory

@@ -66,11 +66,11 @@ class AuthService:
                 error_message="Пользователь с такой почтой уже существует."
             )
 
-        # role = Role.query.filter_by(name=role_settings.default_user_role).first()
+        role = Role.query.filter_by(name=role_settings.default_user_role).first()
         user = User(login=login, email=email, password=password, is_admin=False)
 
         alchemy.session.add(user)
-        # role.users.append(user)
+        role.users.append(user)
         alchemy.session.commit()
 
         return user.to_dict()

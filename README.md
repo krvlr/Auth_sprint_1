@@ -57,6 +57,9 @@ Cервис авторизации предоставляет возможнос
     JWT_SECRET_KEY
     JWT_ACCESS_TOKEN_EXPIRES
     JWT_REFRESH_TOKEN_EXPIRES
+    INITIAL_USER_ROLES
+    INITIAL_USER_DESCRIPTION_ROLES
+    DEFAULT_USER_ROLE
     LOGGING_LEVEL
     LOG_FORMAT
 
@@ -94,23 +97,7 @@ Cервис авторизации предоставляет возможнос
 
     touch .env
 
-указать в нем значения следующих переменных окружения:
-
-    AUTH_DB_HOST
-    AUTH_DB_PORT
-    AUTH_DB_NAME
-    AUTH_DB_USER
-    AUTH_DB_PASSWORD
-    AUTH_REDIS_HOST
-    AUTH_REDIS_PORT
-    JWT_COOKIE_SECURE
-    JWT_TOKEN_LOCATION
-    JWT_SECRET_KEY
-    JWT_ACCESS_TOKEN_EXPIRES
-    JWT_REFRESH_TOKEN_EXPIRES
-    LOGGING_LEVEL
-    LOG_FORMAT
-
+указать в нем значения тех же переменных окружения, что и для основного `docker-compose`,
 создать файл `.env.tests` (в качестве примера `flask-auth/tests/functional/.env.tests.example`):
 
     touch .env.tests

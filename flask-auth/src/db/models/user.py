@@ -89,6 +89,7 @@ class User(alchemy.Model):
             is_active=self.is_active,
             is_verified=self.is_verified,
             is_admin=self.is_admin,
+            roles=self.get_roles(),
         )
 
 
